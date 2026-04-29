@@ -123,18 +123,20 @@ import { ElMessage, type FormInstance } from 'element-plus'
 import { productApi } from '@/api/business'
 
 const statusMap: Record<number, string> = {
-  0: '待提交',
-  1: '待审核',
-  2: '已审核',
-  3: '已入库',
-  4: '已出库',
-  5: '已完成',
-  6: '已取消',
+  0: '未提交',
+  1: '订单受理',
+  2: '已发货',
+  3: '已签收',
+  4: '已检测',
+  5: '已接单(上门/到店)',
+  8: '完成交易',
+  9: '订单取消',
+  10: '已退货',
 }
 
 function statusTagType(status: number) {
   const map: Record<number, string> = {
-    0: 'info', 1: 'warning', 2: '', 3: 'success', 4: '', 5: 'success', 6: 'danger',
+    0: 'info', 1: 'warning', 2: '', 3: '', 4: 'success', 5: '', 8: 'success', 9: 'danger', 10: 'danger',
   }
   return map[status] || 'info'
 }
