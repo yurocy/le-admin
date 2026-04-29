@@ -6,7 +6,9 @@
         <el-option v-for="(label, val) in statusMap" :key="val" :label="label" :value="Number(val)" />
       </el-select>
       <el-input v-model="searchForm.method" placeholder="方式" clearable style="width: 140px" />
-      <el-input v-model="searchForm.source" placeholder="来源" clearable style="width: 140px" />
+      <el-select v-model="searchForm.source" placeholder="来源" clearable style="width: 140px">
+        <el-option v-for="(label, val) in sourceMap" :key="val" :label="label" :value="Number(val)" />
+      </el-select>
       <el-date-picker
         v-model="searchForm.dateRange"
         type="daterange"
@@ -28,6 +30,11 @@
       <el-table-column prop="actualprice" label="实际价" width="100" align="right" />
       <el-table-column prop="applyprice" label="申请价" width="100" align="right" />
       <el-table-column prop="method" label="方式" width="100" />
+      <el-table-column label="来源" width="110">
+        <template #default="{ row }">
+          <el-tag type="info" size="small">{{ sourceMap[row.source] || '未知' }}</el-tag>
+        </template>
+      </el-table-column>
       <el-table-column label="状态" width="100">
         <template #default="{ row }">
           <el-tag :type="statusTagType(row.status)">{{ statusMap[row.status] || '未知' }}</el-tag>
@@ -132,6 +139,16 @@ const statusMap: Record<number, string> = {
   8: '完成交易',
   9: '订单取消',
   10: '已退货',
+}
+
+const sourceMap: Record<number, string> = {
+  0: '未知',
+  1: '电脑版',
+  2: '手机版',
+  3: 'APP',
+  4: '商家',
+  5: '迪信通',
+  6: '小程序',
 }
 
 function statusTagType(status: number) {
