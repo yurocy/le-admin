@@ -2,7 +2,6 @@
   <div class="sidebar">
     <div class="logo">
       <img src="/logo.png" alt="乐回收" class="logo-img" />
-      <h1 v-if="!appStore.sidebarCollapsed">乐回收管理</h1>
     </div>
     <el-scrollbar>
       <el-menu

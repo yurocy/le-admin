@@ -24,10 +24,10 @@ export default defineConfig({
     },
   },
   server: {
-    port: 3200,
+    port: 8028,
     proxy: {
       '/api': {
-        target: 'http://localhost:8080',
+        target: 'http://localhost:8085',
         changeOrigin: true,
       },
     },
