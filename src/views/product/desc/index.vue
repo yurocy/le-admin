@@ -235,8 +235,23 @@
           <el-form-item label="名称">
             <el-input v-model="editingImage.name" placeholder="图片名称" />
           </el-form-item>
-          <el-form-item label="图片URL">
-            <el-input v-model="editingImage.image" placeholder="图片地址" />
+          <el-form-item label="图片">
+            <el-upload
+              class="desc-image-uploader"
+              action="/api/uploadFile"
+              name="file"
+              :show-file-list="false"
+              :on-success="onImageUploadSuccess"
+              accept="image/*"
+            >
+              <el-image
+                v-if="editingImage.image"
+                :src="editingImage.image"
+                style="width: 100px; height: 100px"
+                fit="cover"
+              />
+              <el-icon v-else class="desc-upload-icon"><Plus /></el-icon>
+            </el-upload>
           </el-form-item>
           <el-form-item label="说明">
             <el-input v-model="editingImage.textinfo" placeholder="图片说明" />
@@ -254,6 +269,7 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { Plus } from '@element-plus/icons-vue'
 import { productApi } from '@/api/business'
 
 interface DescOptionItem {
@@ -512,6 +528,15 @@ function editImage(row: any) {
   showAddImage.value = true
 }
 
+function onImageUploadSuccess(res: any) {
+  if (res.code === 0 && res.data?.url) {
+    editingImage.image = res.data.url
+    ElMessage.success('上传成功')
+  } else {
+    ElMessage.error(res.message || '上传失败')
+  }
+}
+
 async function saveImage() {
   submitLoading.value = true
   try {
@@ -605,5 +630,27 @@ onMounted(() => { fetchData() })
 
 .image-actions {
   margin-bottom: 12px;
+}
+
+.desc-image-uploader {
+  :deep(.el-upload) {
+    border: 1px dashed #d9d9d9;
+    border-radius: 6px;
+    cursor: pointer;
+    overflow: hidden;
+    width: 100px;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color 0.2s;
+    &:hover {
+      border-color: #409eff;
+    }
+  }
+  .desc-upload-icon {
+    font-size: 28px;
+    color: #8c939d;
+  }
 }
 </style>
