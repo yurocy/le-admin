@@ -160,8 +160,8 @@ async function fetchOptions() {
   try {
     const [catRes, brandRes, descRes]: any[] = await Promise.all([
       productApi.listCategory(),
-      productApi.listBrand(),
-      productApi.listDesc(),
+      productApi.listBrand({ page: 1, page_size: 100 }),
+      productApi.listDesc({ page: 1, page_size: 100 }),
     ])
     categoryList.value = catRes.data || catRes || []
     brandList.value = brandRes.data?.list || brandRes.data || brandRes || []
