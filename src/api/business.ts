@@ -24,7 +24,7 @@ export const productApi = {
   getOrder: (id: number) => request.get(`/product/order/${id}`),
   updateOrder: (id: number, data: any) => request.put(`/product/order/${id}`, data),
   // Description Pack
-  listDesc: () => request.get('/product/desc'),
+  listDesc: (params?: any) => request.get('/product/desc', { params: params || { page: 1, page_size: 100 } }),
   getDesc: (id: number) => request.get(`/product/desc/${id}`),
   createDesc: (data: any) => request.post('/product/desc', data),
   updateDesc: (id: number, data: any) => request.put(`/product/desc/${id}`, data),

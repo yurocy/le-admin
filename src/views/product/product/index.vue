@@ -165,7 +165,7 @@ async function fetchOptions() {
     ])
     categoryList.value = catRes.data || catRes || []
     brandList.value = brandRes.data?.list || brandRes.data || brandRes || []
-    descList.value = descRes.data || descRes || []
+    descList.value = descRes.data?.list || descRes.data || descRes || []
   } catch {
     // ignore
   }
