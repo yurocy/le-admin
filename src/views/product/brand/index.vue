@@ -13,7 +13,11 @@
 
     <el-table :data="tableData" v-loading="loading" border stripe>
       <el-table-column prop="id" label="ID" width="80" />
-      <el-table-column prop="type_id" label="TypeID" width="100" />
+      <el-table-column label="分类" width="120">
+        <template #default="{ row }">
+          {{ getCategoryName(row.type_id) }}
+        </template>
+      </el-table-column>
       <el-table-column prop="name" label="名称" min-width="150" />
       <el-table-column label="图片" width="100">
         <template #default="{ row }">
@@ -114,6 +118,11 @@ async function fetchCategories() {
   } catch {
     // ignore
   }
+}
+
+function getCategoryName(typeId: number): string {
+  const cat = categoryList.value.find((item: any) => item.id === typeId)
+  return cat ? cat.name : String(typeId)
 }
 
 async function fetchData() {

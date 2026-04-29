@@ -1,8 +1,8 @@
 <template>
   <div class="sidebar">
     <div class="logo">
+      <img src="/logo.png" alt="乐回收" class="logo-img" />
       <h1 v-if="!appStore.sidebarCollapsed">乐回收管理</h1>
-      <h1 v-else>乐</h1>
     </div>
     <el-scrollbar>
       <el-menu
@@ -92,11 +92,18 @@ function getSingleTitle(route: any) {
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 8px;
   color: #fff;
   font-size: 18px;
   font-weight: 700;
   border-bottom: 1px solid #ffffff1a;
   flex-shrink: 0;
+
+  .logo-img {
+    height: 36px;
+    width: auto;
+    object-fit: contain;
+  }
 
   h1 {
     margin: 0;
