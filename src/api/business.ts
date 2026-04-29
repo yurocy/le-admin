@@ -25,9 +25,15 @@ export const productApi = {
   updateOrder: (id: number, data: any) => request.put(`/product/order/${id}`, data),
   // Description Pack
   listDesc: () => request.get('/product/desc'),
+  getDesc: (id: number) => request.get(`/product/desc/${id}`),
   createDesc: (data: any) => request.post('/product/desc', data),
   updateDesc: (id: number, data: any) => request.put(`/product/desc/${id}`, data),
   deleteDesc: (id: number) => request.delete(`/product/desc/${id}`),
+  // Desc Image
+  listDescImage: () => request.get('/product/desc-image'),
+  createDescImage: (data: any) => request.post('/product/desc-image', data),
+  updateDescImage: (id: number, data: any) => request.put(`/product/desc-image/${id}`, data),
+  deleteDescImage: (id: number) => request.delete(`/product/desc-image/${id}`),
   // Coupon
   listCoupon: (params?: any) => request.get('/product/coupon', { params }),
   createCoupon: (data: any) => request.post('/product/coupon', data),
