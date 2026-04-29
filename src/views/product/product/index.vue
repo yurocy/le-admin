@@ -29,12 +29,7 @@
       <el-table-column prop="product_price" label="商品价" width="100" align="right" />
       <el-table-column prop="lowest_price" label="最低价" width="100" align="right" />
       <el-table-column prop="new_price" label="全新价" width="100" align="right" />
-      <el-table-column prop="price7" label="价格走势" width="100" align="center">
-        <template #default="{ row }">
-          <el-button v-if="row.price7" type="primary" link size="small" @click="window.open(row.price7, '_blank')">查看</el-button>
-          <span v-else>-</span>
-        </template>
-      </el-table-column>
+      <el-table-column prop="price7" label="价格走势" width="150" show-overflow-tooltip />
       <el-table-column prop="success" label="已回收" width="80" align="center" />
       <el-table-column label="热门" width="80">
         <template #default="{ row }">

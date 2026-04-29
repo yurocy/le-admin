@@ -6,18 +6,7 @@
     <el-table :data="tableData" v-loading="loading" border stripe>
       <el-table-column prop="id" label="ID" width="80" />
       <el-table-column prop="name" label="名称" min-width="150" />
-      <el-table-column label="图片" width="100">
-        <template #default="{ row }">
-          <el-image
-            v-if="row.image"
-            :src="row.image"
-            :preview-src-list="[row.image]"
-            style="width: 50px; height: 50px"
-            fit="cover"
-          />
-          <span v-else>-</span>
-        </template>
-      </el-table-column>
+      <el-table-column prop="image" label="图片" min-width="200" show-overflow-tooltip />
       <el-table-column prop="sort" label="排序" width="100" />
       <el-table-column label="操作" width="180" fixed="right">
         <template #default="{ row }">

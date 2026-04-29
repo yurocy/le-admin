@@ -22,18 +22,18 @@
 
     <el-table :data="tableData" v-loading="loading" border stripe>
       <el-table-column prop="id" label="ID" width="70" />
-      <el-table-column prop="order_id" label="订单ID" width="120" />
+      <el-table-column prop="orderid" label="订单ID" width="120" />
       <el-table-column prop="product_name" label="商品名称" min-width="150" show-overflow-tooltip />
-      <el-table-column prop="assess_price" label="评估价" width="100" align="right" />
-      <el-table-column prop="actual_price" label="实际价" width="100" align="right" />
-      <el-table-column prop="apply_price" label="申请价" width="100" align="right" />
+      <el-table-column prop="assessprice" label="评估价" width="100" align="right" />
+      <el-table-column prop="actualprice" label="实际价" width="100" align="right" />
+      <el-table-column prop="applyprice" label="申请价" width="100" align="right" />
       <el-table-column prop="method" label="方式" width="100" />
       <el-table-column label="状态" width="100">
         <template #default="{ row }">
           <el-tag :type="statusTagType(row.status)">{{ statusMap[row.status] || '未知' }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="created_at" label="创建时间" width="170" />
+      <el-table-column prop="tratime" label="创建时间" width="170" />
       <el-table-column label="操作" width="120" fixed="right">
         <template #default="{ row }">
           <el-button type="primary" link @click="handleEdit(row)">编辑</el-button>
@@ -63,23 +63,23 @@
         <el-row :gutter="20">
           <el-col :span="12">
             <el-form-item label="评估价">
-              <el-input-number v-model="form.assess_price" :min="0" :precision="2" style="width: 100%" />
+              <el-input-number v-model="form.assessprice" :min="0" :precision="2" style="width: 100%" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
             <el-form-item label="实际价">
-              <el-input-number v-model="form.actual_price" :min="0" :precision="2" style="width: 100%" />
+              <el-input-number v-model="form.actualprice" :min="0" :precision="2" style="width: 100%" />
             </el-form-item>
           </el-col>
         </el-row>
         <el-form-item label="申请价">
-          <el-input-number v-model="form.apply_price" :min="0" :precision="2" style="width: 100%" />
+          <el-input-number v-model="form.applyprice" :min="0" :precision="2" style="width: 100%" />
         </el-form-item>
         <el-form-item label="方式">
           <el-input v-model="form.method" placeholder="回收方式" />
         </el-form-item>
         <el-form-item label="实际描述">
-          <el-input v-model="form.actual_desc" type="textarea" :rows="2" />
+          <el-input v-model="form.actualdesc" type="textarea" :rows="2" />
         </el-form-item>
         <el-form-item label="快递单号">
           <el-input v-model="form.exp_order" placeholder="快递单号" />
@@ -91,7 +91,7 @@
           <el-input v-model="form.info" type="textarea" :rows="2" />
         </el-form-item>
         <el-form-item label="描述">
-          <el-input v-model="form.desc_text" type="textarea" :rows="2" />
+          <el-input v-model="form.desctext" type="textarea" :rows="2" />
         </el-form-item>
         <el-row :gutter="20">
           <el-col :span="12">
@@ -158,15 +158,15 @@ const pagination = reactive({ page: 1, pageSize: 10, total: 0 })
 
 const form = reactive({
   status: 0,
-  assess_price: 0,
-  actual_price: 0,
-  apply_price: 0,
-  method: '',
-  actual_desc: '',
+  assessprice: 0,
+  actualprice: 0,
+  applyprice: 0,
+  method: 0,
+  actualdesc: '',
   exp_order: '',
   tester: '',
   info: '',
-  desc_text: '',
+  desctext: '',
   is_problem: false,
   exp_on: false,
   send_sms: false,
@@ -212,24 +212,24 @@ async function handleEdit(row: any) {
     const data = res.data || res
     Object.assign(form, {
       status: data.status ?? row.status,
-      assess_price: data.assess_price ?? row.assess_price ?? 0,
-      actual_price: data.actual_price ?? row.actual_price ?? 0,
-      apply_price: data.apply_price ?? row.apply_price ?? 0,
-      method: data.method ?? row.method ?? '',
-      actual_desc: data.actual_desc ?? '',
+      assessprice: data.assessprice ?? row.assessprice ?? 0,
+      actualprice: data.actualprice ?? row.actualprice ?? 0,
+      applyprice: data.applyprice ?? row.applyprice ?? 0,
+      method: data.method ?? row.method ?? 0,
+      actualdesc: data.actualdesc ?? '',
       exp_order: data.exp_order ?? '',
       tester: data.tester ?? '',
       info: data.info ?? '',
-      desc_text: data.desc_text ?? '',
+      desctext: data.desctext ?? '',
       is_problem: data.is_problem ?? false,
       exp_on: data.exp_on ?? false,
       send_sms: data.send_sms ?? false,
     })
   } catch {
     Object.assign(form, {
-      status: row.status, assess_price: row.assess_price ?? 0, actual_price: row.actual_price ?? 0,
-      apply_price: row.apply_price ?? 0, method: row.method ?? '',
-      actual_desc: '', exp_order: '', tester: '', info: '', desc_text: '',
+      status: row.status, assessprice: row.assessprice ?? 0, actualprice: row.actualprice ?? 0,
+      applyprice: row.applyprice ?? 0, method: row.method ?? 0,
+      actualdesc: '', exp_order: '', tester: '', info: '', desctext: '',
       is_problem: false, exp_on: false, send_sms: false,
     })
   }

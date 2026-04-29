@@ -19,18 +19,7 @@
         </template>
       </el-table-column>
       <el-table-column prop="name" label="名称" min-width="150" />
-      <el-table-column label="图片" width="100">
-        <template #default="{ row }">
-          <el-image
-            v-if="row.image"
-            :src="row.image"
-            :preview-src-list="[row.image]"
-            style="width: 50px; height: 50px"
-            fit="cover"
-          />
-          <span v-else>-</span>
-        </template>
-      </el-table-column>
+      <el-table-column prop="image" label="图片" min-width="200" show-overflow-tooltip />
       <el-table-column prop="sort" label="排序" width="80" />
       <el-table-column label="热门" width="80">
         <template #default="{ row }">
@@ -49,6 +38,18 @@
         </template>
       </el-table-column>
     </el-table>
+
+    <div class="pagination-wrap">
+      <el-pagination
+        v-model:current-page="pagination.page"
+        v-model:page-size="pagination.pageSize"
+        :total="pagination.total"
+        :page-sizes="[10, 20, 50]"
+        layout="total, sizes, prev, pager, next, jumper"
+        @size-change="fetchData"
+        @current-change="fetchData"
+      />
+    </div>
 
     <el-dialog v-model="dialogVisible" :title="isEdit ? '编辑品牌' : '添加品牌'" width="500px" destroy-on-close>
       <el-form ref="formRef" :model="form" :rules="rules" label-width="80px">
@@ -96,6 +97,7 @@ const editId = ref<number>(0)
 const formRef = ref<FormInstance>()
 
 const searchForm = reactive({ category_id: '' })
+const pagination = reactive({ page: 1, pageSize: 10, total: 0 })
 
 const form = reactive({
   type_id: '' as any,
@@ -128,10 +130,11 @@ function getCategoryName(typeId: number): string {
 async function fetchData() {
   loading.value = true
   try {
-    const params: any = {}
+    const params: any = { page: pagination.page, pageSize: pagination.pageSize }
     if (searchForm.category_id) params.category_id = searchForm.category_id
     const res: any = await productApi.listBrand(params)
     tableData.value = res.data?.list || res.data || res || []
+    pagination.total = res.data?.total || 0
   } catch {
     ElMessage.error('获取品牌列表失败')
   } finally {
@@ -140,6 +143,7 @@ async function fetchData() {
 }
 
 function handleSearch() {
+  pagination.page = 1
   fetchData()
 }
 

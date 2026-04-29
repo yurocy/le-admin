@@ -51,8 +51,10 @@
 
     <el-dialog v-model="dialogVisible" :title="isEdit ? '编辑商品' : '添加商品'" width="500px" destroy-on-close>
       <el-form ref="formRef" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="品牌ID" prop="brand_id">
-          <el-input v-model="form.brand_id" placeholder="品牌ID" />
+        <el-form-item label="品牌" prop="brand_id">
+          <el-select v-model="form.brand_id" placeholder="选择品牌" style="width: 100%">
+            <el-option v-for="item in brandList" :key="item.id" :label="item.name" :value="item.id" />
+          </el-select>
         </el-form-item>
         <el-form-item label="商品名称" prop="productname">
           <el-input v-model="form.productname" placeholder="请输入商品名称" />
@@ -86,12 +88,13 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox, type FormInstance } from 'element-plus'
-import { saleApi } from '@/api/business'
+import { saleApi, productApi } from '@/api/business'
 
 const loading = ref(false)
 const submitLoading = ref(false)
 const tableData = ref<any[]>([])
 const levelList = ref<any[]>([])
+const brandList = ref<any[]>([])
 const dialogVisible = ref(false)
 const isEdit = ref(false)
 const editId = ref<number>(0)
@@ -118,6 +121,15 @@ async function fetchLevels() {
   try {
     const res: any = await saleApi.listLevel()
     levelList.value = res.data || res || []
+  } catch {
+    // ignore
+  }
+}
+
+async function fetchBrands() {
+  try {
+    const res: any = await productApi.listBrand()
+    brandList.value = res.data?.list || res.data || res || []
   } catch {
     // ignore
   }
@@ -201,6 +213,7 @@ async function handleDelete(row: any) {
 
 onMounted(() => {
   fetchLevels()
+  fetchBrands()
   fetchData()
 })
 </script>

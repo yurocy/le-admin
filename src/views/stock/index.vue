@@ -26,15 +26,16 @@
 
     <el-table :data="tableData" v-loading="loading" border stripe>
       <el-table-column prop="id" label="ID" width="70" />
-      <el-table-column prop="product_name" label="商品名称" min-width="140" show-overflow-tooltip />
+      <el-table-column prop="productname" label="商品名称" min-width="140" show-overflow-tooltip />
       <el-table-column prop="imei" label="IMEI" width="150" />
-      <el-table-column prop="ass_price" label="评估价" width="100" align="right" />
-      <el-table-column prop="all_pay" label="总支付" width="100" align="right" />
-      <el-table-column prop="out_price" label="出库价" width="100" align="right" />
+      <el-table-column prop="number" label="编号" width="120" />
+      <el-table-column prop="assprice" label="评估价" width="100" align="right" />
+      <el-table-column prop="allpay" label="总支付" width="100" align="right" />
+      <el-table-column prop="outprice" label="出库价" width="100" align="right" />
       <el-table-column prop="profit" label="利润" width="100" align="right" />
       <el-table-column prop="agent_id" label="代理商ID" width="100" />
       <el-table-column prop="addtime" label="入库时间" width="170" />
-      <el-table-column prop="sale_time" label="售出时间" width="170" />
+      <el-table-column prop="saletime" label="售出时间" width="170" />
       <el-table-column label="操作" width="180" fixed="right">
         <template #default="{ row }">
           <el-button type="primary" link @click="handleEdit(row)">编辑</el-button>
@@ -57,21 +58,33 @@
 
     <el-dialog v-model="dialogVisible" :title="isEdit ? '编辑商品' : '添加商品'" width="700px" destroy-on-close>
       <el-form ref="formRef" :model="form" :rules="rules" label-width="100px">
-        <el-form-item label="商品名称" prop="product_name">
-          <el-input v-model="form.product_name" placeholder="请输入商品名称" />
+        <el-form-item label="商品名称" prop="productname">
+          <el-input v-model="form.productname" placeholder="请输入商品名称" />
         </el-form-item>
         <el-form-item label="IMEI" prop="imei">
           <el-input v-model="form.imei" placeholder="请输入IMEI" />
         </el-form-item>
         <el-row :gutter="20">
           <el-col :span="12">
+            <el-form-item label="编号">
+              <el-input v-model="form.number" placeholder="编号" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="付款状态">
+              <el-input v-model="form.pay" placeholder="付款状态" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="12">
             <el-form-item label="评估价">
-              <el-input-number v-model="form.ass_price" :min="0" :precision="2" style="width: 100%" />
+              <el-input-number v-model="form.assprice" :min="0" :precision="2" style="width: 100%" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
             <el-form-item label="检测价">
-              <el-input-number v-model="form.check_price" :min="0" :precision="2" style="width: 100%" />
+              <el-input-number v-model="form.checkprice" :min="0" :precision="2" style="width: 100%" />
             </el-form-item>
           </el-col>
         </el-row>
@@ -83,22 +96,25 @@
           </el-col>
           <el-col :span="12">
             <el-form-item label="最终价">
-              <el-input-number v-model="form.last_price" :min="0" :precision="2" style="width: 100%" />
+              <el-input-number v-model="form.lastprice" :min="0" :precision="2" style="width: 100%" />
             </el-form-item>
           </el-col>
         </el-row>
         <el-row :gutter="20">
           <el-col :span="12">
             <el-form-item label="总支付">
-              <el-input-number v-model="form.all_pay" :min="0" :precision="2" style="width: 100%" />
+              <el-input-number v-model="form.allpay" :min="0" :precision="2" style="width: 100%" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
             <el-form-item label="出库价">
-              <el-input-number v-model="form.out_price" :min="0" :precision="2" style="width: 100%" />
+              <el-input-number v-model="form.outprice" :min="0" :precision="2" style="width: 100%" />
             </el-form-item>
           </el-col>
         </el-row>
+        <el-form-item label="应付总款">
+          <el-input-number v-model="form.dues" :min="0" :precision="2" style="width: 100%" />
+        </el-form-item>
         <el-form-item label="活动">
           <el-input v-model="form.activity" placeholder="活动名称" />
         </el-form-item>
@@ -171,15 +187,15 @@ const searchForm = reactive({
 const pagination = reactive({ page: 1, pageSize: 10, total: 0 })
 
 const defaultForm = {
-  product_name: '', imei: '', ass_price: 0, check_price: 0, repay: 0,
-  last_price: 0, all_pay: 0, out_price: 0, activity: '', desc: '', info: '',
+  number: '', productname: '', imei: '', assprice: 0, checkprice: 0, repay: 0,
+  lastprice: 0, allpay: 0, outprice: 0, pay: '', dues: 0, activity: '', desc: '', info: '',
   agent_id: '', exp_com: '', exp_order: '', exp_fee: 0, exp_safe: 0, exp_pay: 0,
 }
 
 const form = reactive({ ...defaultForm })
 
 const rules = {
-  product_name: [{ required: true, message: '请输入商品名称', trigger: 'blur' }],
+  productname: [{ required: true, message: '请输入商品名称', trigger: 'blur' }],
 }
 
 async function fetchData() {
@@ -225,9 +241,10 @@ function handleEdit(row: any) {
   isEdit.value = true
   editId.value = row.id
   Object.assign(form, {
-    product_name: row.product_name ?? '', imei: row.imei ?? '', ass_price: row.ass_price ?? 0,
-    check_price: row.check_price ?? 0, repay: row.repay ?? 0, last_price: row.last_price ?? 0,
-    all_pay: row.all_pay ?? 0, out_price: row.out_price ?? 0, activity: row.activity ?? '',
+    number: row.number ?? '', productname: row.productname ?? '', imei: row.imei ?? '',
+    assprice: row.assprice ?? 0, checkprice: row.checkprice ?? 0, repay: row.repay ?? 0,
+    lastprice: row.lastprice ?? 0, allpay: row.allpay ?? 0, outprice: row.outprice ?? 0,
+    pay: row.pay ?? '', dues: row.dues ?? 0, activity: row.activity ?? '',
     desc: row.desc ?? '', info: row.info ?? '', agent_id: row.agent_id ?? '',
     exp_com: row.exp_com ?? '', exp_order: row.exp_order ?? '',
     exp_fee: row.exp_fee ?? 0, exp_safe: row.exp_safe ?? 0, exp_pay: row.exp_pay ?? 0,
