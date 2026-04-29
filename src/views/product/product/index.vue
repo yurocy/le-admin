@@ -25,6 +25,7 @@
       <el-table-column prop="product_name" label="商品名称" min-width="150" show-overflow-tooltip />
       <el-table-column prop="brand" label="品牌" width="100" />
       <el-table-column prop="model" label="型号" width="120" show-overflow-tooltip />
+      <el-table-column prop="desc_name" label="描述包" width="120" show-overflow-tooltip />
       <el-table-column prop="product_price" label="商品价" width="100" align="right" />
       <el-table-column prop="lowest_price" label="最低价" width="100" align="right" />
       <el-table-column prop="new_price" label="全新价" width="100" align="right" />
