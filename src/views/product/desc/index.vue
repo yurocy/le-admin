@@ -5,17 +5,17 @@
       <el-button type="success" @click="imageDrawerVisible = true; fetchImages()">图片库管理</el-button>
     </div>
 
-    <el-table :data="tableData" v-loading="loading" border stripe row-key="id">
+    <el-table :data="tableData" v-loading="loading" border stripe>
       <el-table-column prop="id" label="ID" width="80" />
       <el-table-column prop="name" label="描述包名称" min-width="200" />
       <el-table-column label="标题数" width="100" align="center">
         <template #default="{ row }">
-          <el-tag>{{ row.titles?.length || 0 }}</el-tag>
+          <el-tag>{{ row.title_count || 0 }}</el-tag>
         </template>
       </el-table-column>
       <el-table-column label="条目数" width="100" align="center">
         <template #default="{ row }">
-          {{ totalOptions(row) }}
+          {{ row.option_count || 0 }}
         </template>
       </el-table-column>
       <el-table-column label="操作" width="200" fixed="right">
@@ -26,6 +26,18 @@
         </template>
       </el-table-column>
     </el-table>
+
+    <div class="pagination-wrap">
+      <el-pagination
+        v-model:current-page="pagination.page"
+        v-model:page-size="pagination.pageSize"
+        :total="pagination.total"
+        :page-sizes="[10, 20, 50]"
+        layout="total, sizes, prev, pager, next, jumper"
+        @size-change="fetchData"
+        @current-change="fetchData"
+      />
+    </div>
 
     <!-- 重命名对话框 -->
     <el-dialog v-model="renameVisible" title="重命名描述包" width="400px" destroy-on-close>
@@ -268,13 +280,16 @@ interface DescTitleItem {
 interface DescPackage {
   id: number
   name: string
-  titles: DescTitleItem[]
+  title_count?: number
+  option_count?: number
+  titles?: DescTitleItem[]
 }
 
 // State
 const loading = ref(false)
 const submitLoading = ref(false)
 const tableData = ref<DescPackage[]>([])
+const pagination = reactive({ page: 1, pageSize: 10, total: 0 })
 const imageList = ref<any[]>([])
 
 // Rename
@@ -298,7 +313,7 @@ const showAddImage = ref(false)
 const editingImage = reactive({ id: 0, name: '', image: '', textinfo: '' })
 
 function totalOptions(desc: DescPackage): number {
-  return (desc.titles || []).reduce((sum, t) => sum + (t.options?.length || 0), 0)
+  return (desc.option_count || 0) || (desc.titles || []).reduce((sum, t) => sum + (t.options?.length || 0), 0)
 }
 
 function getOptImage(imageId: number | null | undefined) {
@@ -311,8 +326,9 @@ function getOptImage(imageId: number | null | undefined) {
 async function fetchData() {
   loading.value = true
   try {
-    const res: any = await productApi.listDesc()
-    tableData.value = res.data || res || []
+    const res: any = await productApi.listDesc({ page: pagination.page, pageSize: pagination.pageSize })
+    tableData.value = res.data?.list || res.data || res || []
+    pagination.total = res.data?.total || 0
   } catch {
     ElMessage.error('获取描述包列表失败')
   } finally {
@@ -353,9 +369,8 @@ async function submitRename() {
 
 async function handleDelete(row: DescPackage) {
   try {
-    const optCount = totalOptions(row)
     await ElMessageBox.confirm(
-      `确定删除描述包「${row.name}」吗？包含 ${row.titles?.length || 0} 个标题、${optCount} 个条目，将全部删除。`,
+      `确定删除描述包「${row.name}」吗？包含 ${row.title_count || 0} 个标题、${row.option_count || 0} 个条目，将全部删除。`,
       '删除确认', { type: 'warning' }
     )
     await productApi.deleteDesc(row.id)
@@ -369,7 +384,14 @@ async function handleDelete(row: DescPackage) {
 async function handleManage(row: DescPackage) {
   currentDesc.id = row.id
   currentDesc.name = row.name
-  currentDesc.titles = JSON.parse(JSON.stringify(row.titles || []))
+  // 管理时再加载完整3层数据
+  try {
+    const res: any = await productApi.getDesc(row.id)
+    const data = res.data || res
+    currentDesc.titles = data.titles || []
+  } catch {
+    currentDesc.titles = []
+  }
   manageVisible.value = true
   expandedTitles.value = []
   await fetchImages()
