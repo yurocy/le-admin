@@ -29,6 +29,13 @@
       <el-table-column prop="product_price" label="商品价" width="100" align="right" />
       <el-table-column prop="lowest_price" label="最低价" width="100" align="right" />
       <el-table-column prop="new_price" label="全新价" width="100" align="right" />
+      <el-table-column prop="price7" label="价格走势" width="100" align="center">
+        <template #default="{ row }">
+          <el-button v-if="row.price7" type="primary" link size="small" @click="window.open(row.price7, '_blank')">查看</el-button>
+          <span v-else>-</span>
+        </template>
+      </el-table-column>
+      <el-table-column prop="success" label="已回收" width="80" align="center" />
       <el-table-column label="热门" width="80">
         <template #default="{ row }">
           <el-tag :type="row.ishot ? 'danger' : 'info'">{{ row.ishot ? '是' : '否' }}</el-tag>
@@ -87,6 +94,9 @@
         <el-form-item label="全新价格" prop="new_price">
           <el-input-number v-model="form.new_price" :min="0" :precision="2" />
         </el-form-item>
+        <el-form-item label="价格走势" prop="price7">
+          <el-input v-model="form.price7" placeholder="价格走势URL" />
+        </el-form-item>
         <el-form-item label="商品图片" prop="product_img">
           <el-input v-model="form.product_img" placeholder="请输入图片URL" />
         </el-form-item>
@@ -138,6 +148,7 @@ const form = reactive({
   product_price: 0,
   lowest_price: 0,
   new_price: 0,
+  price7: '',
   product_img: '',
   ishot: false,
   display: true,
@@ -202,7 +213,7 @@ function handleAdd() {
   editId.value = 0
   Object.assign(form, {
     product_name: '', model: '', brand_id: '', desc_id: '',
-    product_price: 0, lowest_price: 0, new_price: 0,
+    product_price: 0, lowest_price: 0, new_price: 0, price7: '',
     product_img: '', ishot: false, display: true, sort: 0, search_text: '',
   })
   dialogVisible.value = true
@@ -213,7 +224,7 @@ function handleEdit(row: any) {
   editId.value = row.id
   Object.assign(form, {
     product_name: row.product_name, model: row.model, brand_id: row.brand_id, desc_id: row.desc_id,
-    product_price: row.product_price, lowest_price: row.lowest_price, new_price: row.new_price,
+    product_price: row.product_price, lowest_price: row.lowest_price, new_price: row.new_price, price7: row.price7,
     product_img: row.product_img, ishot: row.ishot, display: row.display, sort: row.sort, search_text: row.search_text,
   })
   dialogVisible.value = true
