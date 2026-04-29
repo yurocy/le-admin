@@ -326,7 +326,7 @@ function getOptImage(imageId: number | null | undefined) {
 async function fetchData() {
   loading.value = true
   try {
-    const res: any = await productApi.listDesc({ page: pagination.page, pageSize: pagination.pageSize })
+    const res: any = await productApi.listDesc({ page: pagination.page, page_size: pagination.pageSize })
     tableData.value = res.data?.list || res.data || res || []
     pagination.total = res.data?.total || 0
   } catch {
