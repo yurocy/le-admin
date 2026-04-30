@@ -44,8 +44,8 @@
 
     <el-dialog v-model="dialogVisible" :title="isEdit ? '编辑合作伙伴' : '添加合作伙伴'" width="500px" destroy-on-close>
       <el-form ref="formRef" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="名称" prop="name">
-          <el-input v-model="form.name" placeholder="请输入名称" />
+        <el-form-item label="公司" prop="company">
+          <el-input v-model="form.company" placeholder="请输入公司名称" />
         </el-form-item>
         <el-form-item label="联系人" prop="contact">
           <el-input v-model="form.contact" placeholder="联系人" />
@@ -101,12 +101,12 @@ const formRef = ref<FormInstance>()
 const searchForm = reactive({ keyword: '' })
 const pagination = reactive({ page: 1, pageSize: 10, total: 0 })
 
-const defaultForm = { name: '', contact: '', usertel: '', city_id: '' as any, address: '', info: '', status: true, agent_id: '' }
+const defaultForm = { company: '', contact: '', usertel: '', city_id: '' as any, address: '', info: '', status: true, agent_id: '' }
 const form = reactive({ ...defaultForm })
 const cityList = ref<any[]>([])
 
 const rules = {
-  name: [{ required: true, message: '请输入名称', trigger: 'blur' }],
+  company: [{ required: true, message: '请输入公司名称', trigger: 'blur' }],
 }
 
 async function fetchData() {
@@ -132,7 +132,7 @@ function handleAdd() {
 function handleEdit(row: any) {
   isEdit.value = true; editId.value = row.id
   Object.assign(form, {
-    name: row.name, contact: row.contact, usertel: row.usertel, city_id: row.city_id,
+    company: row.company, contact: row.contact, usertel: row.usertel, city_id: row.city_id,
     address: row.address, info: row.info, status: !!row.status, agent_id: row.agent_id ?? '',
   })
   dialogVisible.value = true
