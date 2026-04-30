@@ -91,7 +91,7 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, type FormInstance } from 'element-plus'
-import { saleApi, productApi } from '@/api/business'
+import { saleApi, webApi } from '@/api/business'
 
 const statusMap: Record<number, string> = {
   0: '已取消', 1: '已报价', 2: '竞价成功', 3: '竞价失败',
@@ -171,7 +171,7 @@ async function handleSubmit() {
 
 async function fetchExpress() {
   try {
-    const res: any = await productApi.listExpress()
+    const res: any = await webApi.listExpress()
     expressList.value = res.data?.list || res.data || res || []
   } catch {
     // ignore
