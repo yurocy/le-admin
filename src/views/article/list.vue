@@ -16,7 +16,7 @@
     <el-table :data="tableData" v-loading="loading" border stripe>
       <el-table-column prop="id" label="ID" width="70" />
       <el-table-column prop="title" label="标题" min-width="200" show-overflow-tooltip />
-      <el-table-column prop="category_id" label="分类ID" width="80" />
+      <el-table-column prop="category_name" label="分类" width="120" />
       <el-table-column prop="keyword" label="关键词" width="120" show-overflow-tooltip />
       <el-table-column prop="info" label="摘要" min-width="180" show-overflow-tooltip />
       <el-table-column label="热门" width="70">
