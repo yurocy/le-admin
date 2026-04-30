@@ -12,7 +12,7 @@
 
     <el-table :data="tableData" v-loading="loading" border stripe>
       <el-table-column prop="id" label="ID" width="70" />
-      <el-table-column prop="name" label="名称" min-width="140" />
+      <el-table-column prop="company" label="公司" min-width="140" show-overflow-tooltip />
       <el-table-column prop="contact" label="联系人" width="100" />
       <el-table-column prop="usertel" label="电话" width="130" />
       <el-table-column prop="city_name" label="城市" width="100" />
