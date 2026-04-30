@@ -3,7 +3,7 @@
     <div class="search-bar">
       <el-input v-model="searchForm.keyword" placeholder="关键词" clearable style="width: 180px" />
       <el-select v-model="searchForm.category_id" placeholder="分类" clearable style="width: 160px">
-        <el-option v-for="item in categoryList" :key="item.id" :label="item.name" :value="item.id" />
+        <el-option v-for="item in categoryList" :key="item.id" :label="item.classname" :value="item.id" />
       </el-select>
       <el-button type="primary" @click="handleSearch">搜索</el-button>
       <el-button @click="handleReset">重置</el-button>
@@ -16,15 +16,15 @@
     <el-table :data="tableData" v-loading="loading" border stripe>
       <el-table-column prop="id" label="ID" width="70" />
       <el-table-column prop="title" label="标题" min-width="200" show-overflow-tooltip />
-      <el-table-column prop="category_id" label="分类ID" width="100" />
-      <el-table-column prop="author" label="作者" width="100" />
-      <el-table-column prop="view_count" label="浏览量" width="100" align="right" />
-      <el-table-column label="状态" width="80">
+      <el-table-column prop="category_id" label="分类ID" width="80" />
+      <el-table-column prop="keyword" label="关键词" width="120" show-overflow-tooltip />
+      <el-table-column prop="info" label="摘要" min-width="180" show-overflow-tooltip />
+      <el-table-column label="热门" width="70">
         <template #default="{ row }">
-          <el-tag :type="row.status ? 'success' : 'danger'">{{ row.status ? '发布' : '草稿' }}</el-tag>
+          <el-tag :type="row.ishot ? 'danger' : 'info'" size="small">{{ row.ishot ? '是' : '否' }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="created_at" label="创建时间" width="170" />
+      <el-table-column prop="date" label="日期" width="120" />
       <el-table-column label="操作" width="180" fixed="right">
         <template #default="{ row }">
           <el-button type="primary" link @click="handleEdit(row)">编辑</el-button>
@@ -54,27 +54,33 @@
           <el-col :span="12">
             <el-form-item label="分类" prop="category_id">
               <el-select v-model="form.category_id" placeholder="选择分类" style="width: 100%">
-                <el-option v-for="item in categoryList" :key="item.id" :label="item.name" :value="item.id" />
+                <el-option v-for="item in categoryList" :key="item.id" :label="item.classname" :value="item.id" />
               </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="作者">
-              <el-input v-model="form.author" placeholder="作者" />
+            <el-form-item label="日期" prop="date">
+              <el-date-picker v-model="form.date" type="date" placeholder="选择日期" value-format="YYYY-MM-DD" style="width: 100%" />
             </el-form-item>
           </el-col>
         </el-row>
+        <el-row :gutter="20">
+          <el-col :span="12">
+            <el-form-item label="关键词">
+              <el-input v-model="form.keyword" placeholder="关键词" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="热门">
+              <el-switch v-model="form.ishot" active-text="是" inactive-text="否" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-form-item label="摘要">
+          <el-input v-model="form.info" type="textarea" :rows="2" placeholder="文章摘要" />
+        </el-form-item>
         <el-form-item label="内容" prop="content">
-          <el-input v-model="form.content" type="textarea" :rows="6" placeholder="文章内容" />
-        </el-form-item>
-        <el-form-item label="封面图">
-          <el-input v-model="form.cover_img" placeholder="封面图片URL" />
-        </el-form-item>
-        <el-form-item label="信息">
-          <el-input v-model="form.info" type="textarea" :rows="2" placeholder="摘要信息" />
-        </el-form-item>
-        <el-form-item label="状态">
-          <el-switch v-model="form.status" active-text="发布" inactive-text="草稿" />
+          <el-input v-model="form.content" type="textarea" :rows="8" placeholder="文章内容" />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -102,12 +108,13 @@ const formRef = ref<FormInstance>()
 const searchForm = reactive({ keyword: '', category_id: '' as any })
 const pagination = reactive({ page: 1, pageSize: 10, total: 0 })
 
-const defaultForm = { title: '', category_id: '' as any, author: '', content: '', cover_img: '', info: '', status: true }
+const defaultForm = { title: '', category_id: '' as any, date: '', keyword: '', info: '', content: '', ishot: false }
 const form = reactive({ ...defaultForm })
 
 const rules = {
   title: [{ required: true, message: '请输入文章标题', trigger: 'blur' }],
   category_id: [{ required: true, message: '请选择分类', trigger: 'change' }],
+  date: [{ required: true, message: '请选择日期', trigger: 'change' }],
 }
 
 async function fetchCategories() {
@@ -134,8 +141,8 @@ function handleAdd() { isEdit.value = false; editId.value = 0; Object.assign(for
 function handleEdit(row: any) {
   isEdit.value = true; editId.value = row.id
   Object.assign(form, {
-    title: row.title, category_id: row.category_id, author: row.author, content: row.content,
-    cover_img: row.cover_img, info: row.info, status: row.status,
+    title: row.title, category_id: row.category_id, date: row.date,
+    keyword: row.keyword, info: row.info, content: row.content, ishot: !!row.ishot,
   })
   dialogVisible.value = true
 }

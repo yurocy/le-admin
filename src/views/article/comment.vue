@@ -1,21 +1,35 @@
 <template>
   <div class="page-container">
     <div class="search-bar">
-      <el-input v-model="searchForm.keyword" placeholder="关键词" clearable style="width: 180px" />
+      <el-select v-model="searchForm.type" placeholder="类型" clearable style="width: 120px">
+        <el-option label="产品评论" :value="1" />
+        <el-option label="文章评论" :value="2" />
+        <el-option label="其他" :value="0" />
+      </el-select>
       <el-button type="primary" @click="handleSearch">搜索</el-button>
       <el-button @click="handleReset">重置</el-button>
     </div>
 
     <el-table :data="tableData" v-loading="loading" border stripe>
       <el-table-column prop="id" label="ID" width="70" />
-      <el-table-column prop="article_id" label="文章ID" width="100" />
-      <el-table-column prop="username" label="用户名" width="120" />
+      <el-table-column label="类型" width="100">
+        <template #default="{ row }">
+          <el-tag :type="row.type === 1 ? '' : row.type === 2 ? 'success' : 'info'">{{ typeMap[row.type] || '其他' }}</el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column prop="usertel" label="用户电话" width="130" />
       <el-table-column label="内容" min-width="250" show-overflow-tooltip>
         <template #default="{ row }">
           {{ row.content && row.content.length > 80 ? row.content.slice(0, 80) + '...' : row.content }}
         </template>
       </el-table-column>
-      <el-table-column prop="created_at" label="创建时间" width="170" />
+      <el-table-column prop="ip" label="IP" width="130" />
+      <el-table-column label="评分" width="80">
+        <template #default="{ row }">
+          <el-rate v-model="row.mark" disabled />
+        </template>
+      </el-table-column>
+      <el-table-column prop="addtime" label="时间" width="170" />
       <el-table-column label="操作" width="100" fixed="right">
         <template #default="{ row }">
           <el-button type="danger" link @click="handleDelete(row)">删除</el-button>
@@ -42,17 +56,19 @@ import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { articleApi } from '@/api/business'
 
+const typeMap: Record<number, string> = { 0: '其他', 1: '产品评论', 2: '文章评论' }
+
 const loading = ref(false)
 const tableData = ref<any[]>([])
 
-const searchForm = reactive({ keyword: '' })
+const searchForm = reactive({ type: '' as any })
 const pagination = reactive({ page: 1, pageSize: 10, total: 0 })
 
 async function fetchData() {
   loading.value = true
   try {
     const params: any = { page: pagination.page, pageSize: pagination.pageSize }
-    if (searchForm.keyword) params.keyword = searchForm.keyword
+    if (searchForm.type !== '' && searchForm.type != null) params.type = searchForm.type
     const res: any = await articleApi.listComment(params)
     tableData.value = res.data?.list || res.data || res || []
     pagination.total = res.data?.total || 0
@@ -60,7 +76,7 @@ async function fetchData() {
 }
 
 function handleSearch() { pagination.page = 1; fetchData() }
-function handleReset() { searchForm.keyword = ''; pagination.page = 1; fetchData() }
+function handleReset() { searchForm.type = ''; pagination.page = 1; fetchData() }
 
 async function handleDelete(row: any) {
   try {

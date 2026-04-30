@@ -1,7 +1,17 @@
 <template>
   <div class="page-container">
     <div class="search-bar">
-      <el-input v-model="searchForm.keyword" placeholder="关键词" clearable style="width: 180px" />
+      <el-select v-model="searchForm.status" placeholder="状态" clearable style="width: 120px">
+        <el-option label="竞拍中" :value="1" />
+        <el-option label="已结束" :value="2" />
+        <el-option label="已取消" :value="3" />
+      </el-select>
+      <el-select v-model="searchForm.category_id" placeholder="分类" clearable style="width: 140px">
+        <el-option v-for="item in categoryList" :key="item.id" :label="item.name" :value="item.id" />
+      </el-select>
+      <el-select v-model="searchForm.brand_id" placeholder="品牌" clearable style="width: 140px">
+        <el-option v-for="item in brandList" :key="item.id" :label="item.name" :value="item.id" />
+      </el-select>
       <el-button type="primary" @click="handleSearch">搜索</el-button>
       <el-button @click="handleReset">重置</el-button>
     </div>
@@ -12,18 +22,22 @@
 
     <el-table :data="tableData" v-loading="loading" border stripe>
       <el-table-column prop="id" label="ID" width="70" />
-      <el-table-column prop="product_name" label="商品名称" min-width="150" show-overflow-tooltip />
-      <el-table-column prop="category_id" label="分类ID" width="100" />
-      <el-table-column prop="brand_id" label="品牌ID" width="100" />
-      <el-table-column prop="start_price" label="起拍价" width="100" align="right" />
-      <el-table-column prop="current_price" label="当前价" width="100" align="right" />
-      <el-table-column prop="start_time" label="开始时间" width="170" />
-      <el-table-column prop="end_time" label="结束时间" width="170" />
-      <el-table-column label="状态" width="80">
+      <el-table-column prop="title" label="标题" min-width="140" show-overflow-tooltip />
+      <el-table-column prop="sn" label="SN" width="120" />
+      <el-table-column prop="imei" label="IMEI" width="140" />
+      <el-table-column prop="category_name" label="分类" width="100" />
+      <el-table-column prop="brand_name" label="品牌" width="100" />
+      <el-table-column prop="ctype_name" label="类型" width="100" />
+      <el-table-column prop="price" label="价格" width="100" align="right" />
+      <el-table-column prop="amount" label="数量" width="80" align="right" />
+      <el-table-column prop="grade" label="成色" width="80" />
+      <el-table-column label="状态" width="90">
         <template #default="{ row }">
           <el-tag :type="statusTagType(row.status)">{{ statusMap[row.status] || '未知' }}</el-tag>
         </template>
       </el-table-column>
+      <el-table-column prop="addtime" label="添加时间" width="170" />
+      <el-table-column prop="endtime" label="结束时间" width="170" />
       <el-table-column label="操作" width="180" fixed="right">
         <template #default="{ row }">
           <el-button type="primary" link @click="handleEdit(row)">编辑</el-button>
@@ -44,48 +58,99 @@
       />
     </div>
 
-    <el-dialog v-model="dialogVisible" :title="isEdit ? '编辑竞拍商品' : '添加竞拍商品'" width="600px" destroy-on-close>
-      <el-form ref="formRef" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="商品名称" prop="product_name">
-          <el-input v-model="form.product_name" placeholder="请输入商品名称" />
+    <el-dialog v-model="dialogVisible" :title="isEdit ? '编辑竞拍商品' : '添加竞拍商品'" width="650px" destroy-on-close>
+      <el-form ref="formRef" :model="form" :rules="rules" label-width="90px">
+        <el-form-item label="标题" prop="title">
+          <el-input v-model="form.title" placeholder="请输入标题" />
         </el-form-item>
         <el-row :gutter="20">
           <el-col :span="12">
+            <el-form-item label="SN" prop="sn">
+              <el-input v-model="form.sn" placeholder="SN" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="IMEI" prop="imei">
+              <el-input v-model="form.imei" placeholder="IMEI" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="8">
             <el-form-item label="分类" prop="category_id">
-              <el-input v-model="form.category_id" placeholder="分类ID" />
+              <el-select v-model="form.category_id" placeholder="分类" style="width: 100%">
+                <el-option v-for="item in categoryList" :key="item.id" :label="item.name" :value="item.id" />
+              </el-select>
             </el-form-item>
           </el-col>
-          <el-col :span="12">
+          <el-col :span="8">
             <el-form-item label="品牌" prop="brand_id">
-              <el-input v-model="form.brand_id" placeholder="品牌ID" />
+              <el-select v-model="form.brand_id" placeholder="品牌" style="width: 100%">
+                <el-option v-for="item in brandList" :key="item.id" :label="item.name" :value="item.id" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="类型" prop="ctype_id">
+              <el-select v-model="form.ctype_id" placeholder="类型" style="width: 100%">
+                <el-option v-for="item in typeList" :key="item.id" :label="item.name" :value="item.id" />
+              </el-select>
             </el-form-item>
           </el-col>
         </el-row>
-        <el-form-item label="起拍价" prop="start_price">
-          <el-input-number v-model="form.start_price" :min="0" :precision="2" style="width: 100%" />
-        </el-form-item>
+        <el-row :gutter="20">
+          <el-col :span="8">
+            <el-form-item label="价格" prop="price">
+              <el-input-number v-model="form.price" :min="0" style="width: 100%" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="数量">
+              <el-input-number v-model="form.amount" :min="1" style="width: 100%" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="成色">
+              <el-input-number v-model="form.grade" :min="0" style="width: 100%" />
+            </el-form-item>
+          </el-col>
+        </el-row>
         <el-row :gutter="20">
           <el-col :span="12">
-            <el-form-item label="开始时间" prop="start_time">
-              <el-date-picker v-model="form.start_time" type="datetime" placeholder="开始时间" value-format="YYYY-MM-DD HH:mm:ss" style="width: 100%" />
+            <el-form-item label="结束时间">
+              <el-date-picker v-model="form.endtime" type="datetime" placeholder="结束时间" value-format="YYYY-MM-DD HH:mm:ss" style="width: 100%" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="结束时间" prop="end_time">
-              <el-date-picker v-model="form.end_time" type="datetime" placeholder="结束时间" value-format="YYYY-MM-DD HH:mm:ss" style="width: 100%" />
+            <el-form-item label="状态">
+              <el-select v-model="form.status" style="width: 100%">
+                <el-option label="竞拍中" :value="1" />
+                <el-option label="已结束" :value="2" />
+                <el-option label="已取消" :value="3" />
+              </el-select>
             </el-form-item>
           </el-col>
         </el-row>
-        <el-form-item label="描述">
-          <el-input v-model="form.desc" type="textarea" :rows="3" />
+        <el-row :gutter="20">
+          <el-col :span="12">
+            <el-form-item label="电池">
+              <el-input v-model="form.battery" placeholder="电池信息" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="保修">
+              <el-input v-model="form.safeguard" placeholder="保修信息" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-form-item label="配件">
+          <el-input v-model="form.parts" placeholder="配件信息" />
+        </el-form-item>
+        <el-form-item label="图片">
+          <el-input v-model="form.image" placeholder="主图URL" />
         </el-form-item>
         <el-form-item label="信息">
           <el-input v-model="form.info" type="textarea" :rows="2" />
-        </el-form-item>
-        <el-form-item label="状态">
-          <el-select v-model="form.status" style="width: 100%">
-            <el-option v-for="(label, val) in statusMap" :key="val" :label="label" :value="Number(val)" />
-          </el-select>
         </el-form-item>
       </el-form>
       <template #footer>
@@ -101,37 +166,58 @@ import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox, type FormInstance } from 'element-plus'
 import { biddingApi } from '@/api/business'
 
-const statusMap: Record<number, string> = { 0: '未开始', 1: '进行中', 2: '已结束', 3: '已取消' }
+const statusMap: Record<number, string> = { 1: '竞拍中', 2: '已结束', 3: '已取消' }
 
 function statusTagType(status: number) {
-  const map: Record<number, string> = { 0: 'info', 1: 'success', 2: '', 3: 'danger' }
+  const map: Record<number, string> = { 1: 'success', 2: 'info', 3: 'danger' }
   return map[status] || 'info'
 }
 
 const loading = ref(false)
 const submitLoading = ref(false)
 const tableData = ref<any[]>([])
+const categoryList = ref<any[]>([])
+const brandList = ref<any[]>([])
+const typeList = ref<any[]>([])
 const dialogVisible = ref(false)
 const isEdit = ref(false)
 const editId = ref<number>(0)
 const formRef = ref<FormInstance>()
 
-const searchForm = reactive({ keyword: '' })
+const searchForm = reactive({ status: '' as any, category_id: '' as any, brand_id: '' as any })
 const pagination = reactive({ page: 1, pageSize: 10, total: 0 })
 
-const defaultForm = { product_name: '', category_id: '' as any, brand_id: '' as any, start_price: 0, start_time: '', end_time: '', desc: '', info: '', status: 0 }
+const defaultForm = {
+  title: '', sn: '', imei: '', category_id: '' as any, brand_id: '' as any, ctype_id: '' as any,
+  price: 0, amount: 1, grade: 0, battery: '', safeguard: '', parts: '',
+  image: '', info: '', status: 1, endtime: '',
+}
 const form = reactive({ ...defaultForm })
 
 const rules = {
-  product_name: [{ required: true, message: '请输入商品名称', trigger: 'blur' }],
-  start_price: [{ required: true, message: '请输入起拍价', trigger: 'blur' }],
+  title: [{ required: true, message: '请输入标题', trigger: 'blur' }],
+  sn: [{ required: true, message: '请输入SN', trigger: 'blur' }],
+  imei: [{ required: true, message: '请输入IMEI', trigger: 'blur' }],
+}
+
+async function fetchOptions() {
+  try {
+    const [catRes, brandRes, typeRes]: any[] = await Promise.all([
+      biddingApi.listCategory(), biddingApi.listBrand(), biddingApi.listType()
+    ])
+    categoryList.value = catRes.data || catRes || []
+    brandList.value = brandRes.data || brandRes || []
+    typeList.value = typeRes.data || typeRes || []
+  } catch { /* ignore */ }
 }
 
 async function fetchData() {
   loading.value = true
   try {
     const params: any = { page: pagination.page, pageSize: pagination.pageSize }
-    if (searchForm.keyword) params.keyword = searchForm.keyword
+    if (searchForm.status !== '' && searchForm.status != null) params.status = searchForm.status
+    if (searchForm.category_id) params.category_id = searchForm.category_id
+    if (searchForm.brand_id) params.brand_id = searchForm.brand_id
     const res: any = await biddingApi.listProduct(params)
     tableData.value = res.data?.list || res.data || res || []
     pagination.total = res.data?.total || 0
@@ -139,16 +225,17 @@ async function fetchData() {
 }
 
 function handleSearch() { pagination.page = 1; fetchData() }
-function handleReset() { searchForm.keyword = ''; pagination.page = 1; fetchData() }
+function handleReset() { Object.assign(searchForm, { status: '', category_id: '', brand_id: '' }); pagination.page = 1; fetchData() }
 
 function handleAdd() { isEdit.value = false; editId.value = 0; Object.assign(form, { ...defaultForm }); dialogVisible.value = true }
 
 function handleEdit(row: any) {
   isEdit.value = true; editId.value = row.id
   Object.assign(form, {
-    product_name: row.product_name, category_id: row.category_id, brand_id: row.brand_id,
-    start_price: row.start_price, start_time: row.start_time, end_time: row.end_time,
-    desc: row.desc, info: row.info, status: row.status,
+    title: row.title, sn: row.sn, imei: row.imei, category_id: row.category_id,
+    brand_id: row.brand_id, ctype_id: row.ctype_id, price: row.price, amount: row.amount,
+    grade: row.grade, battery: row.battery, safeguard: row.safeguard, parts: row.parts,
+    image: row.image, info: row.info, status: row.status, endtime: row.endtime,
   })
   dialogVisible.value = true
 }
@@ -167,5 +254,5 @@ async function handleDelete(row: any) {
   try { await ElMessageBox.confirm('确定删除该竞拍商品吗？', '提示', { type: 'warning' }); await biddingApi.deleteProduct(row.id); ElMessage.success('删除成功'); fetchData() } catch { /* cancelled */ }
 }
 
-onMounted(() => { fetchData() })
+onMounted(() => { fetchOptions(); fetchData() })
 </script>
