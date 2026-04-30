@@ -2,7 +2,7 @@
   <div class="login-container">
     <div class="login-card">
       <h2 class="login-title">乐回收管理系统</h2>
-      <p class="login-subtitle">LeHuiSho Admin Panel</p>
+      <p class="login-subtitle">Lehuiso Admin Panel</p>
       <el-form ref="formRef" :model="form" :rules="rules" size="large" @keyup.enter="handleLogin">
         <el-form-item prop="username">
           <el-input v-model="form.username" placeholder="请输入用户名" prefix-icon="User" />
