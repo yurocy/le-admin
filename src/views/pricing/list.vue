@@ -1,7 +1,6 @@
 <template>
   <div class="page-container">
     <div class="search-bar">
-      <el-input v-model="searchForm.keyword" placeholder="关键词" clearable style="width: 180px" />
       <el-select v-model="searchForm.category_id" placeholder="分类" clearable style="width: 160px">
         <el-option v-for="item in categoryList" :key="item.id" :label="item.name" :value="item.id" />
       </el-select>
@@ -18,15 +17,16 @@
 
     <el-table :data="tableData" v-loading="loading" border stripe>
       <el-table-column prop="id" label="ID" width="70" />
-      <el-table-column prop="product_name" label="商品名称" min-width="150" show-overflow-tooltip />
-      <el-table-column prop="brand_id" label="品牌ID" width="100" />
-      <el-table-column prop="category_id" label="分类ID" width="100" />
-      <el-table-column prop="price" label="价格" width="100" align="right" />
-      <el-table-column label="状态" width="80">
+      <el-table-column prop="title" label="标题" min-width="150" show-overflow-tooltip />
+      <el-table-column prop="category_name" label="分类" width="120" />
+      <el-table-column prop="brand_name" label="品牌" width="120" />
+      <el-table-column prop="image" label="图片" width="100">
         <template #default="{ row }">
-          <el-tag :type="row.status ? 'success' : 'danger'">{{ row.status ? '启用' : '禁用' }}</el-tag>
+          <el-image v-if="row.image" :src="row.image" style="width: 60px; height: 60px" fit="cover" :preview-src-list="[row.image]" />
+          <span v-else>-</span>
         </template>
       </el-table-column>
+      <el-table-column prop="addtime" label="添加时间" width="170" />
       <el-table-column label="操作" width="180" fixed="right">
         <template #default="{ row }">
           <el-button type="primary" link @click="handleEdit(row)">编辑</el-button>
@@ -47,10 +47,10 @@
       />
     </div>
 
-    <el-dialog v-model="dialogVisible" :title="isEdit ? '编辑报价' : '添加报价'" width="500px" destroy-on-close>
+    <el-dialog v-model="dialogVisible" :title="isEdit ? '编辑报价' : '添加报价'" width="600px" destroy-on-close>
       <el-form ref="formRef" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="商品名称" prop="product_name">
-          <el-input v-model="form.product_name" placeholder="请输入商品名称" />
+        <el-form-item label="标题" prop="title">
+          <el-input v-model="form.title" placeholder="请输入标题" />
         </el-form-item>
         <el-form-item label="分类" prop="category_id">
           <el-select v-model="form.category_id" placeholder="选择分类" style="width: 100%">
@@ -62,14 +62,14 @@
             <el-option v-for="item in brandList" :key="item.id" :label="item.name" :value="item.id" />
           </el-select>
         </el-form-item>
-        <el-form-item label="价格" prop="price">
-          <el-input-number v-model="form.price" :min="0" :precision="2" />
+        <el-form-item label="图片">
+          <el-input v-model="form.image" placeholder="图片URL" />
         </el-form-item>
-        <el-form-item label="信息">
-          <el-input v-model="form.info" type="textarea" :rows="2" />
+        <el-form-item label="报价文件">
+          <el-input v-model="form.pricefile" placeholder="报价文件URL" />
         </el-form-item>
-        <el-form-item label="状态">
-          <el-switch v-model="form.status" />
+        <el-form-item label="详细信息">
+          <el-input v-model="form.info" type="textarea" :rows="4" placeholder="详细信息" />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -95,16 +95,16 @@ const isEdit = ref(false)
 const editId = ref<number>(0)
 const formRef = ref<FormInstance>()
 
-const searchForm = reactive({ keyword: '', category_id: '' as any, brand_id: '' as any })
+const searchForm = reactive({ category_id: '' as any, brand_id: '' as any })
 const pagination = reactive({ page: 1, pageSize: 10, total: 0 })
 
-const defaultForm = { product_name: '', category_id: '' as any, brand_id: '' as any, price: 0, info: '', status: true }
+const defaultForm = { title: '', category_id: '' as any, brand_id: '' as any, image: '', pricefile: '', info: '' }
 const form = reactive({ ...defaultForm })
 
 const rules = {
-  product_name: [{ required: true, message: '请输入商品名称', trigger: 'blur' }],
+  title: [{ required: true, message: '请输入标题', trigger: 'blur' }],
   category_id: [{ required: true, message: '请选择分类', trigger: 'change' }],
-  price: [{ required: true, message: '请输入价格', trigger: 'blur' }],
+  brand_id: [{ required: true, message: '请选择品牌', trigger: 'change' }],
 }
 
 async function fetchOptions() {
@@ -119,7 +119,6 @@ async function fetchData() {
   loading.value = true
   try {
     const params: any = { page: pagination.page, pageSize: pagination.pageSize }
-    if (searchForm.keyword) params.keyword = searchForm.keyword
     if (searchForm.category_id) params.category_id = searchForm.category_id
     if (searchForm.brand_id) params.brand_id = searchForm.brand_id
     const res: any = await pricingApi.listPricing(params)
@@ -129,10 +128,17 @@ async function fetchData() {
 }
 
 function handleSearch() { pagination.page = 1; fetchData() }
-function handleReset() { Object.assign(searchForm, { keyword: '', category_id: '', brand_id: '' }); pagination.page = 1; fetchData() }
+function handleReset() { Object.assign(searchForm, { category_id: '', brand_id: '' }); pagination.page = 1; fetchData() }
 
 function handleAdd() { isEdit.value = false; editId.value = 0; Object.assign(form, { ...defaultForm }); dialogVisible.value = true }
-function handleEdit(row: any) { isEdit.value = true; editId.value = row.id; Object.assign(form, { product_name: row.product_name, category_id: row.category_id, brand_id: row.brand_id, price: row.price, info: row.info, status: row.status }); dialogVisible.value = true }
+function handleEdit(row: any) {
+  isEdit.value = true; editId.value = row.id
+  Object.assign(form, {
+    title: row.title, category_id: row.category_id, brand_id: row.brand_id,
+    image: row.image, pricefile: row.pricefile, info: row.info,
+  })
+  dialogVisible.value = true
+}
 
 async function handleSubmit() {
   await formRef.value?.validate()
