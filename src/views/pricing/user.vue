@@ -16,9 +16,11 @@
 
     <el-table :data="tableData" v-loading="loading" border stripe>
       <el-table-column prop="id" label="ID" width="70" />
-      <el-table-column prop="username" label="用户名" min-width="120" />
-      <el-table-column prop="phone" label="电话" width="130" />
-      <el-table-column prop="city" label="城市" width="100" />
+      <el-table-column prop="username" label="用户名" width="100" />
+      <el-table-column prop="usertel" label="电话" width="130" />
+      <el-table-column prop="company" label="公司" min-width="140" show-overflow-tooltip />
+      <el-table-column prop="address" label="地址" min-width="160" show-overflow-tooltip />
+      <el-table-column prop="regtime" label="注册时间" width="170" />
       <el-table-column label="状态" width="80">
         <template #default="{ row }">
           <el-tag :type="row.status ? 'success' : 'danger'">{{ row.status ? '启用' : '禁用' }}</el-tag>
@@ -55,14 +57,14 @@
         <el-form-item v-if="!isEdit" label="密码" prop="password">
           <el-input v-model="form.password" type="password" placeholder="请输入密码" show-password />
         </el-form-item>
-        <el-form-item label="电话">
-          <el-input v-model="form.phone" placeholder="电话号码" />
+        <el-form-item label="电话" prop="usertel">
+          <el-input v-model="form.usertel" placeholder="电话号码" />
         </el-form-item>
-        <el-form-item label="城市">
-          <el-input v-model="form.city" placeholder="城市" />
+        <el-form-item label="公司">
+          <el-input v-model="form.company" placeholder="公司名称" />
         </el-form-item>
-        <el-form-item label="信息">
-          <el-input v-model="form.info" type="textarea" :rows="2" />
+        <el-form-item label="地址">
+          <el-input v-model="form.address" placeholder="详细地址" />
         </el-form-item>
         <el-form-item label="状态">
           <el-switch v-model="form.status" />
@@ -92,7 +94,7 @@ const formRef = ref<FormInstance>()
 const searchForm = reactive({ keyword: '', status: '' as any })
 const pagination = reactive({ page: 1, pageSize: 10, total: 0 })
 
-const defaultForm = { username: '', password: '', phone: '', city: '', info: '', status: true }
+const defaultForm = { username: '', password: '', usertel: '', company: '', address: '', status: true }
 const form = reactive({ ...defaultForm })
 
 const rules: any = {
@@ -116,7 +118,7 @@ function handleSearch() { pagination.page = 1; fetchData() }
 function handleReset() { Object.assign(searchForm, { keyword: '', status: '' }); pagination.page = 1; fetchData() }
 
 function handleAdd() { isEdit.value = false; editId.value = 0; Object.assign(form, { ...defaultForm }); dialogVisible.value = true }
-function handleEdit(row: any) { isEdit.value = true; editId.value = row.id; Object.assign(form, { username: row.username, password: '', phone: row.phone, city: row.city, info: row.info, status: row.status }); dialogVisible.value = true }
+function handleEdit(row: any) { isEdit.value = true; editId.value = row.id; Object.assign(form, { username: row.username, password: '', usertel: row.usertel, company: row.company, address: row.address, status: !!row.status }); dialogVisible.value = true }
 
 async function handleSubmit() {
   await formRef.value?.validate()
