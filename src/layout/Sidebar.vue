@@ -19,7 +19,7 @@
           <template v-if="!route.children || route.children.length === 1">
             <el-menu-item
               v-if="!route.meta?.hidden"
-              :index="route.children ? route.path + '/' + route.children[0].path : route.path"
+              :index="route.children ? (route.path === '/' ? '/' + route.children[0].path : route.path + '/' + route.children[0].path) : route.path"
             >
               <el-icon v-if="getIcon(route)">
                 <component :is="getIcon(route)" />
