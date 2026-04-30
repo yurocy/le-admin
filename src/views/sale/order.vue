@@ -69,7 +69,9 @@
           </el-select>
         </el-form-item>
         <el-form-item label="快递公司">
-          <el-input v-model="form.express_id" placeholder="快递公司ID" />
+          <el-select v-model="form.express_id" placeholder="选择快递公司" clearable style="width: 100%">
+            <el-option v-for="item in expressList" :key="item.id" :label="item.name" :value="item.id" />
+          </el-select>
         </el-form-item>
         <el-form-item label="快递单号">
           <el-input v-model="form.express_no" placeholder="快递单号" />
@@ -89,7 +91,7 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, type FormInstance } from 'element-plus'
-import { saleApi } from '@/api/business'
+import { saleApi, productApi } from '@/api/business'
 
 const statusMap: Record<number, string> = {
   0: '已取消', 1: '已报价', 2: '竞价成功', 3: '竞价失败',
@@ -115,6 +117,7 @@ const searchForm = reactive({ status: '' as any, user_id: '', goods_id: '' })
 const pagination = reactive({ page: 1, pageSize: 10, total: 0 })
 
 const form = reactive({ status: 0, express_id: 0, express_no: '', info: '' })
+const expressList = ref<any[]>([])
 
 async function fetchData() {
   loading.value = true
@@ -166,7 +169,17 @@ async function handleSubmit() {
   }
 }
 
+async function fetchExpress() {
+  try {
+    const res: any = await productApi.listExpress()
+    expressList.value = res.data?.list || res.data || res || []
+  } catch {
+    // ignore
+  }
+}
+
 onMounted(() => {
+  fetchExpress()
   fetchData()
 })
 </script>
