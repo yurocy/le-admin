@@ -28,14 +28,22 @@
       <el-table-column prop="category_name" label="分类" width="100" />
       <el-table-column prop="brand_name" label="品牌" width="100" />
       <el-table-column prop="ctype_name" label="类型" width="100" />
+      <el-table-column prop="image" label="主图" width="80">
+        <template #default="{ row }">
+          <el-image v-if="row.image" :src="row.image" style="width: 50px; height: 50px" fit="cover" :preview-src-list="[row.image]" />
+          <span v-else>-</span>
+        </template>
+      </el-table-column>
       <el-table-column prop="price" label="价格" width="100" align="right" />
       <el-table-column prop="amount" label="数量" width="80" align="right" />
       <el-table-column prop="grade" label="成色" width="80" />
+      <el-table-column prop="options" label="竞价选项" width="90" />
       <el-table-column label="状态" width="90">
         <template #default="{ row }">
           <el-tag :type="statusTagType(row.status)">{{ statusMap[row.status] || '未知' }}</el-tag>
         </template>
       </el-table-column>
+      <el-table-column prop="activetime" label="上架时间" width="170" />
       <el-table-column prop="addtime" label="添加时间" width="170" />
       <el-table-column prop="endtime" label="结束时间" width="170" />
       <el-table-column label="操作" width="180" fixed="right">
@@ -149,6 +157,12 @@
         <el-form-item label="图片">
           <el-input v-model="form.image" placeholder="主图URL" />
         </el-form-item>
+        <el-form-item label="竞价选项">
+          <el-input-number v-model="form.options" :min="0" style="width: 100%" />
+        </el-form-item>
+        <el-form-item label="上架时间">
+          <el-date-picker v-model="form.activetime" type="datetime" placeholder="上架时间" value-format="YYYY-MM-DD HH:mm:ss" style="width: 100%" />
+        </el-form-item>
         <el-form-item label="信息">
           <el-input v-model="form.info" type="textarea" :rows="2" />
         </el-form-item>
@@ -189,8 +203,8 @@ const pagination = reactive({ page: 1, pageSize: 10, total: 0 })
 
 const defaultForm = {
   title: '', sn: '', imei: '', category_id: '' as any, brand_id: '' as any, ctype_id: '' as any,
-  price: 0, amount: 1, grade: 0, battery: '', safeguard: '', parts: '',
-  image: '', info: '', status: 1, endtime: '',
+  price: 0, amount: 1, grade: 0, options: 0, battery: '', safeguard: '', parts: '',
+  image: '', info: '', status: 1, activetime: '', endtime: '',
 }
 const form = reactive({ ...defaultForm })
 
@@ -234,8 +248,8 @@ function handleEdit(row: any) {
   Object.assign(form, {
     title: row.title, sn: row.sn, imei: row.imei, category_id: row.category_id,
     brand_id: row.brand_id, ctype_id: row.ctype_id, price: row.price, amount: row.amount,
-    grade: row.grade, battery: row.battery, safeguard: row.safeguard, parts: row.parts,
-    image: row.image, info: row.info, status: row.status, endtime: row.endtime,
+    grade: row.grade, options: row.options, battery: row.battery, safeguard: row.safeguard, parts: row.parts,
+    image: row.image, info: row.info, status: row.status, activetime: row.activetime, endtime: row.endtime,
   })
   dialogVisible.value = true
 }
