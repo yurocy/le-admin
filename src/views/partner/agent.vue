@@ -24,7 +24,7 @@
           <el-tag :type="row.status ? 'success' : 'danger'">{{ row.status ? '启用' : '禁用' }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="addtime" label="添加时间" width="170" />
+      <el-table-column prop="regtime" label="添加时间" width="170" />
       <el-table-column label="操作" width="240" fixed="right">
         <template #default="{ row }">
           <el-button type="primary" link @click="handleEdit(row)">编辑</el-button>
