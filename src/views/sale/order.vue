@@ -92,7 +92,7 @@ const formRef = ref<FormInstance>()
 const searchForm = reactive({ status: '' as any, user_id: '', goods_id: '' })
 const pagination = reactive({ page: 1, pageSize: 10, total: 0 })
 
-const form = reactive({ status: 0, express_id: '', express_no: '', info: '' })
+const form = reactive({ status: 0, express_id: 0, express_no: '', info: '' })
 
 async function fetchData() {
   loading.value = true
@@ -125,7 +125,7 @@ function handleReset() {
 function handleEdit(row: any) {
   editId.value = row.id
   Object.assign(form, {
-    status: row.status, express_id: row.express_id ?? '', express_no: row.express_no ?? '', info: row.info ?? '',
+    status: row.status, express_id: row.express_id ?? 0, express_no: row.express_no ?? '', info: row.info ?? '',
   })
   dialogVisible.value = true
 }

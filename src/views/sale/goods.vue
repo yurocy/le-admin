@@ -175,7 +175,7 @@ function handleEdit(row: any) {
   editId.value = row.id
   Object.assign(form, {
     brand_id: row.brand_id, productname: row.productname, amount: row.amount,
-    level_id: row.level_id, desc: row.desc, status: row.status, info: row.info,
+    level_id: row.level_id, desc: row.desc, status: !!row.status, info: row.info,
   })
   dialogVisible.value = true
 }
