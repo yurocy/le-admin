@@ -95,6 +95,7 @@ export const partnerApi = {
   deleteWholeSale: (id: number) => request.delete(`/partner/wholesale/${id}`),
   listJoinIn: (params?: any) => request.get('/partner/joinin', { params }),
   updateJoinInStatus: (id: number, data: any) => request.put(`/partner/joinin/${id}/status`, data),
+  deleteJoinIn: (id: number) => request.delete(`/partner/joinin/${id}`),
   listStore: (params?: any) => request.get('/partner/store', { params }),
   createStore: (data: any) => request.post('/partner/store', data),
   updateStore: (id: number, data: any) => request.put(`/partner/store/${id}`, data),
