@@ -11,7 +11,7 @@
       <el-table-column prop="path" label="图片路径" min-width="200" show-overflow-tooltip />
       <el-table-column label="类型" width="100">
         <template #default="{ row }">
-          <el-tag :type="row.type === 1 ? 'success' : 'info'" size="small">{{ row.type === 1 ? '类型1' : '类型' + row.type }}</el-tag>
+          <el-tag :type="row.type === 1 ? 'success' : 'warning'" size="small">{{ row.type === 1 ? 'PC版' : row.type === 2 ? '手机版' : '类型' + row.type }}</el-tag>
         </template>
       </el-table-column>
       <el-table-column prop="sort" label="排序" width="80" />
@@ -37,7 +37,10 @@
         <el-row :gutter="20">
           <el-col :span="12">
             <el-form-item label="类型" prop="type">
-              <el-input-number v-model="form.type" :min="0" style="width: 100%" />
+              <el-select v-model="form.type" style="width: 100%">
+                <el-option :value="1" label="PC版" />
+                <el-option :value="2" label="手机版" />
+              </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="12">
