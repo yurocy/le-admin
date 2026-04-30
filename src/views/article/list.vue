@@ -45,7 +45,7 @@
       />
     </div>
 
-    <el-dialog v-model="dialogVisible" :title="isEdit ? '编辑文章' : '添加文章'" width="700px" destroy-on-close>
+    <el-dialog v-model="dialogVisible" :title="isEdit ? '编辑文章' : '添加文章'" width="900px" destroy-on-close top="5vh">
       <el-form ref="formRef" :model="form" :rules="rules" label-width="80px">
         <el-form-item label="标题" prop="title">
           <el-input v-model="form.title" placeholder="请输入文章标题" />
@@ -80,7 +80,15 @@
           <el-input v-model="form.info" type="textarea" :rows="2" placeholder="文章摘要" />
         </el-form-item>
         <el-form-item label="内容" prop="content">
-          <el-input v-model="form.content" type="textarea" :rows="8" placeholder="文章内容" />
+          <div style="border: 1px solid #ccc; width: 100%;">
+            <Toolbar :editor="editorRef" :defaultConfig="toolbarConfig" style="border-bottom: 1px solid #ccc;" />
+            <Editor
+              v-model="form.content"
+              :defaultConfig="editorConfig"
+              style="height: 400px; overflow-y: hidden;"
+              @onCreated="handleCreated"
+            />
+          </div>
         </el-form-item>
       </el-form>
       <template #footer>
@@ -92,9 +100,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, onBeforeUnmount, shallowRef } from 'vue'
 import { ElMessage, ElMessageBox, type FormInstance } from 'element-plus'
 import { articleApi } from '@/api/business'
+import '@wangeditor/editor/dist/css/style.css'
+import { Editor, Toolbar } from '@wangeditor/editor-for-vue'
+import type { IDomEditor } from '@wangeditor/editor'
 
 const loading = ref(false)
 const submitLoading = ref(false)
@@ -104,6 +115,19 @@ const dialogVisible = ref(false)
 const isEdit = ref(false)
 const editId = ref<number>(0)
 const formRef = ref<FormInstance>()
+
+// 富文本编辑器
+const editorRef = shallowRef<IDomEditor>()
+const toolbarConfig = {}
+const editorConfig = { placeholder: '请输入文章内容...' }
+
+function handleCreated(editor: IDomEditor) {
+  editorRef.value = editor
+}
+onBeforeUnmount(() => {
+  const editor = editorRef.value
+  if (editor) editor.destroy()
+})
 
 const searchForm = reactive({ keyword: '', category_id: '' as any })
 const pagination = reactive({ page: 1, pageSize: 10, total: 0 })
@@ -118,7 +142,10 @@ const rules = {
 }
 
 async function fetchCategories() {
-  try { const res: any = await articleApi.listCategory(); categoryList.value = res.data || res || [] } catch { /* ignore */ }
+  try {
+    const res: any = await articleApi.listCategory()
+    categoryList.value = res.data || res || []
+  } catch { /* ignore */ }
 }
 
 async function fetchData() {
@@ -130,35 +157,69 @@ async function fetchData() {
     const res: any = await articleApi.listArticle(params)
     tableData.value = res.data?.list || res.data || res || []
     pagination.total = res.data?.total || 0
-  } catch { ElMessage.error('获取文章列表失败') } finally { loading.value = false }
+  } catch {
+    ElMessage.error('获取文章列表失败')
+  } finally {
+    loading.value = false
+  }
 }
 
 function handleSearch() { pagination.page = 1; fetchData() }
 function handleReset() { Object.assign(searchForm, { keyword: '', category_id: '' }); pagination.page = 1; fetchData() }
 
-function handleAdd() { isEdit.value = false; editId.value = 0; Object.assign(form, { ...defaultForm }); dialogVisible.value = true }
+function handleAdd() {
+  isEdit.value = false
+  editId.value = 0
+  Object.assign(form, { ...defaultForm })
+  dialogVisible.value = true
+}
 
-function handleEdit(row: any) {
-  isEdit.value = true; editId.value = row.id
+async function handleEdit(row: any) {
+  isEdit.value = true
+  editId.value = row.id
+  // 先用列表数据填充基本信息，再拉取详情获取 content
   Object.assign(form, {
     title: row.title, category_id: row.category_id, date: row.date,
-    keyword: row.keyword, info: row.info, content: row.content, ishot: !!row.ishot,
+    keyword: row.keyword, info: row.info, content: '', ishot: !!row.ishot,
   })
   dialogVisible.value = true
+  // 加载文章详情（含 content）
+  try {
+    const res: any = await articleApi.getArticle(row.id)
+    const detail = res.data || res
+    if (detail && detail.content) {
+      form.content = detail.content
+    }
+  } catch { /* ignore */ }
 }
 
 async function handleSubmit() {
   await formRef.value?.validate()
   submitLoading.value = true
   try {
-    if (isEdit.value) { await articleApi.updateArticle(editId.value, { ...form }); ElMessage.success('更新成功') }
-    else { await articleApi.createArticle({ ...form }); ElMessage.success('添加成功') }
-    dialogVisible.value = false; fetchData()
-  } catch { ElMessage.error('操作失败') } finally { submitLoading.value = false }
+    if (isEdit.value) {
+      await articleApi.updateArticle(editId.value, { ...form })
+      ElMessage.success('更新成功')
+    } else {
+      await articleApi.createArticle({ ...form })
+      ElMessage.success('添加成功')
+    }
+    dialogVisible.value = false
+    fetchData()
+  } catch {
+    ElMessage.error('操作失败')
+  } finally {
+    submitLoading.value = false
+  }
 }
 
 async function handleDelete(row: any) {
-  try { await ElMessageBox.confirm('确定删除该文章吗？', '提示', { type: 'warning' }); await articleApi.deleteArticle(row.id); ElMessage.success('删除成功'); fetchData() } catch { /* cancelled */ }
+  try {
+    await ElMessageBox.confirm('确定删除该文章吗？', '提示', { type: 'warning' })
+    await articleApi.deleteArticle(row.id)
+    ElMessage.success('删除成功')
+    fetchData()
+  } catch { /* cancelled */ }
 }
 
 onMounted(() => { fetchCategories(); fetchData() })
