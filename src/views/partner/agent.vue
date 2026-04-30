@@ -18,7 +18,7 @@
       <el-table-column prop="id" label="ID" width="70" />
       <el-table-column prop="name" label="名称" min-width="140" />
       <el-table-column prop="usertel" label="电话" width="130" />
-      <el-table-column prop="city" label="城市" width="100" />
+      <el-table-column prop="city_name" label="城市" width="100" />
       <el-table-column label="状态" width="80">
         <template #default="{ row }">
           <el-tag :type="row.status ? 'success' : 'danger'">{{ row.status ? '启用' : '禁用' }}</el-tag>
@@ -60,7 +60,9 @@
           <el-input v-model="form.password" type="password" placeholder="请输入密码" show-password />
         </el-form-item>
         <el-form-item label="城市">
-          <el-input v-model="form.city" placeholder="城市" />
+          <el-select v-model="form.city_id" placeholder="选择城市" clearable filterable style="width: 100%">
+            <el-option v-for="item in cityList" :key="item.id" :label="item.name" :value="item.id" />
+          </el-select>
         </el-form-item>
         <el-form-item label="信息">
           <el-input v-model="form.info" type="textarea" :rows="3" />
@@ -80,7 +82,7 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox, type FormInstance } from 'element-plus'
-import { partnerApi } from '@/api/business'
+import { partnerApi, webApi } from '@/api/business'
 
 const loading = ref(false)
 const submitLoading = ref(false)
@@ -93,8 +95,9 @@ const formRef = ref<FormInstance>()
 const searchForm = reactive({ keyword: '', status: '' as any })
 const pagination = reactive({ page: 1, pageSize: 10, total: 0 })
 
-const defaultForm = { name: '', usertel: '', password: '', city: '', info: '', status: true }
+const defaultForm = { name: '', usertel: '', password: '', city_id: '' as any, info: '', status: true }
 const form = reactive({ ...defaultForm })
+const cityList = ref<any[]>([])
 
 const rules: any = {
   name: [{ required: true, message: '请输入名称', trigger: 'blur' }],
@@ -128,7 +131,7 @@ function handleAdd() {
 
 function handleEdit(row: any) {
   isEdit.value = true; editId.value = row.id
-  Object.assign(form, { name: row.name, usertel: row.usertel, password: '', city: row.city, info: row.info, status: row.status })
+  Object.assign(form, { name: row.name, usertel: row.usertel, password: '', city_id: row.city_id, info: row.info, status: !!row.status })
   dialogVisible.value = true
 }
 
@@ -165,5 +168,12 @@ async function toggleStatus(row: any) {
   } catch { ElMessage.error('操作失败') }
 }
 
-onMounted(() => { fetchData() })
+async function fetchCity() {
+  try {
+    const res: any = await webApi.listCity()
+    cityList.value = res.data?.list || res.data || res || []
+  } catch { /* ignore */ }
+}
+
+onMounted(() => { fetchCity(); fetchData() })
 </script>

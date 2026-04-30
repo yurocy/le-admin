@@ -15,7 +15,7 @@
       <el-table-column prop="name" label="名称" min-width="140" />
       <el-table-column prop="contact" label="联系人" width="100" />
       <el-table-column prop="usertel" label="电话" width="130" />
-      <el-table-column prop="city" label="城市" width="100" />
+      <el-table-column prop="city_name" label="城市" width="100" />
       <el-table-column label="状态" width="80">
         <template #default="{ row }">
           <el-tag :type="row.status ? 'success' : 'danger'">{{ row.status ? '启用' : '禁用' }}</el-tag>
@@ -54,7 +54,9 @@
           <el-input v-model="form.usertel" placeholder="电话" />
         </el-form-item>
         <el-form-item label="城市">
-          <el-input v-model="form.city" placeholder="城市" />
+          <el-select v-model="form.city_id" placeholder="选择城市" clearable filterable style="width: 100%">
+            <el-option v-for="item in cityList" :key="item.id" :label="item.name" :value="item.id" />
+          </el-select>
         </el-form-item>
         <el-form-item label="地址">
           <el-input v-model="form.address" placeholder="详细地址" />
@@ -86,7 +88,7 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox, type FormInstance } from 'element-plus'
-import { partnerApi } from '@/api/business'
+import { partnerApi, webApi } from '@/api/business'
 
 const loading = ref(false)
 const submitLoading = ref(false)
@@ -99,8 +101,9 @@ const formRef = ref<FormInstance>()
 const searchForm = reactive({ keyword: '' })
 const pagination = reactive({ page: 1, pageSize: 10, total: 0 })
 
-const defaultForm = { name: '', contact: '', usertel: '', city: '', address: '', info: '', status: true, agent_id: '' }
+const defaultForm = { name: '', contact: '', usertel: '', city_id: '' as any, address: '', info: '', status: true, agent_id: '' }
 const form = reactive({ ...defaultForm })
+const cityList = ref<any[]>([])
 
 const rules = {
   name: [{ required: true, message: '请输入名称', trigger: 'blur' }],
@@ -129,8 +132,8 @@ function handleAdd() {
 function handleEdit(row: any) {
   isEdit.value = true; editId.value = row.id
   Object.assign(form, {
-    name: row.name, contact: row.contact, usertel: row.usertel, city: row.city,
-    address: row.address, info: row.info, status: row.status, agent_id: row.agent_id ?? '',
+    name: row.name, contact: row.contact, usertel: row.usertel, city_id: row.city_id,
+    address: row.address, info: row.info, status: !!row.status, agent_id: row.agent_id ?? '',
   })
   dialogVisible.value = true
 }
@@ -158,5 +161,12 @@ async function handleDelete(row: any) {
   } catch { /* cancelled */ }
 }
 
-onMounted(() => { fetchData() })
+async function fetchCity() {
+  try {
+    const res: any = await webApi.listCity()
+    cityList.value = res.data?.list || res.data || res || []
+  } catch { /* ignore */ }
+}
+
+onMounted(() => { fetchCity(); fetchData() })
 </script>
