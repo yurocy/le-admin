@@ -1,5 +1,12 @@
 <template>
   <div class="page-container">
+    <div class="search-bar">
+      <el-select v-model="searchType" placeholder="按类型筛选" clearable style="width: 160px" @change="fetchData">
+        <el-option :value="1" label="PC版" />
+        <el-option :value="2" label="手机版" />
+      </el-select>
+    </div>
+
     <div class="table-actions">
       <el-button type="primary" @click="handleAdd">添加轮播图</el-button>
     </div>
@@ -78,10 +85,14 @@ const rules = {
   url: [{ required: true, message: '请输入链接URL', trigger: 'blur' }],
 }
 
+const searchType = ref<any>('')
+
 async function fetchData() {
   loading.value = true
   try {
-    const res: any = await webApi.listIndexPic()
+    const params: any = {}
+    if (searchType.value !== '' && searchType.value !== null) params.type = searchType.value
+    const res: any = await webApi.listIndexPic(params)
     tableData.value = res.data || res || []
   } catch {
     ElMessage.error('获取轮播图列表失败')
