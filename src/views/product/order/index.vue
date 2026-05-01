@@ -246,24 +246,24 @@
         <el-row :gutter="20">
           <el-col :span="8">
             <el-form-item label="问题单">
-              <el-switch v-model="form.is_problem" />
+              <el-switch v-model="form.isproblem" :active-value="1" :inactive-value="0" />
             </el-form-item>
           </el-col>
           <el-col :span="8">
             <el-form-item label="已举报">
-              <el-switch v-model="form.is_reported" />
+              <el-switch v-model="form.isreported" :active-value="1" :inactive-value="0" />
             </el-form-item>
           </el-col>
           <el-col :span="8">
             <el-form-item label="已发货">
-              <el-switch v-model="form.exp_on" />
+              <el-switch v-model="form.exp_on" :active-value="1" :inactive-value="0" />
             </el-form-item>
           </el-col>
         </el-row>
         <el-row :gutter="20">
           <el-col :span="8">
             <el-form-item label="发送短信">
-              <el-switch v-model="form.send_sms" />
+              <el-switch v-model="form.sendsms" :active-value="1" :inactive-value="0" />
             </el-form-item>
           </el-col>
         </el-row>
@@ -360,10 +360,10 @@ const defaultForm = {
   image2: '',
   image3: '',
   image4: '',
-  is_problem: false,
-  is_reported: false,
-  exp_on: false,
-  send_sms: false,
+  isproblem: 0,
+  isreported: 0,
+  exp_on: 0,
+  sendsms: 0,
 }
 
 const form = reactive({ ...defaultForm })
@@ -433,10 +433,10 @@ async function handleEdit(row: any) {
       image2: data.image2 ?? '',
       image3: data.image3 ?? '',
       image4: data.image4 ?? '',
-      is_problem: !!(data.isproblem ?? row.isproblem),
-      is_reported: !!(data.isreported ?? row.isreported),
-      exp_on: !!(data.exp_on ?? row.exp_on),
-      send_sms: !!(data.sendsms ?? row.sendsms),
+      isproblem: data.isproblem ?? row.isproblem ?? 0,
+      isreported: data.isreported ?? row.isreported ?? 0,
+      exp_on: data.exp_on ?? row.exp_on ?? 0,
+      sendsms: data.sendsms ?? row.sendsms ?? 0,
     })
   } catch {
     Object.assign(form, {
@@ -482,10 +482,10 @@ async function handleSubmit() {
       image2: form.image2,
       image3: form.image3,
       image4: form.image4,
-      is_problem: form.is_problem,
-      is_reported: form.is_reported,
+      isproblem: form.isproblem,
+      isreported: form.isreported,
       exp_on: form.exp_on,
-      send_sms: form.send_sms,
+      sendsms: form.sendsms,
     }
     await productApi.updateOrder(editId.value, payload)
     ElMessage.success('更新成功')

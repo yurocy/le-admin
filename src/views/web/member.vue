@@ -9,14 +9,15 @@
     <el-table :data="tableData" v-loading="loading" border stripe>
       <el-table-column prop="id" label="ID" width="70" />
       <el-table-column prop="username" label="用户名" min-width="120" />
-      <el-table-column prop="phone" label="电话" width="130" />
-      <el-table-column prop="email" label="邮箱" min-width="180" show-overflow-tooltip />
-      <el-table-column label="状态" width="80">
-        <template #default="{ row }">
-          <el-tag :type="row.status ? 'success' : 'danger'">{{ row.status ? '正常' : '禁用' }}</el-tag>
-        </template>
-      </el-table-column>
-      <el-table-column prop="created_at" label="注册时间" width="170" />
+      <el-table-column prop="usertel" label="手机号" width="130" />
+      <el-table-column prop="idcard" label="身份证" width="180" show-overflow-tooltip />
+      <el-table-column prop="banknum" label="银行卡号" width="180" show-overflow-tooltip />
+      <el-table-column prop="bankuser" label="持卡人" width="120" />
+      <el-table-column prop="bank_name" label="开户银行" width="120" />
+      <el-table-column prop="city_name" label="城市" width="100" />
+      <el-table-column prop="pay_meth" label="支付方式" width="100" />
+      <el-table-column prop="address" label="地址" min-width="180" show-overflow-tooltip />
+      <el-table-column prop="regtime" label="注册时间" width="170" />
       <el-table-column label="操作" width="180" fixed="right">
         <template #default="{ row }">
           <el-button type="primary" link @click="handleEdit(row)">编辑</el-button>
@@ -39,14 +40,29 @@
 
     <el-dialog v-model="dialogVisible" title="编辑会员" width="500px" destroy-on-close>
       <el-form ref="formRef" :model="form" label-width="80px">
-        <el-form-item label="电话">
-          <el-input v-model="form.phone" placeholder="电话号码" />
+        <el-form-item label="手机号">
+          <el-input v-model="form.usertel" placeholder="手机号码" />
         </el-form-item>
-        <el-form-item label="邮箱">
-          <el-input v-model="form.email" placeholder="邮箱地址" />
+        <el-form-item label="身份证">
+          <el-input v-model="form.idcard" placeholder="身份证号" />
         </el-form-item>
-        <el-form-item label="状态">
-          <el-switch v-model="form.status" />
+        <el-form-item label="银行卡号">
+          <el-input v-model="form.banknum" placeholder="银行卡号" />
+        </el-form-item>
+        <el-form-item label="持卡人">
+          <el-input v-model="form.bankuser" placeholder="持卡人姓名" />
+        </el-form-item>
+        <el-form-item label="开户银行">
+          <el-input v-model="form.bank_name" placeholder="开户银行" />
+        </el-form-item>
+        <el-form-item label="城市">
+          <el-input v-model="form.city_name" placeholder="城市" />
+        </el-form-item>
+        <el-form-item label="支付方式">
+          <el-input v-model="form.pay_meth" placeholder="支付方式" />
+        </el-form-item>
+        <el-form-item label="地址">
+          <el-input v-model="form.address" placeholder="详细地址" />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -71,7 +87,7 @@ const formRef = ref<FormInstance>()
 
 const searchForm = reactive({ keyword: '' })
 const pagination = reactive({ page: 1, pageSize: 10, total: 0 })
-const form = reactive({ phone: '', email: '', status: true })
+const form = reactive({ usertel: '', idcard: '', banknum: '', bankuser: '', city_name: '', bank_name: '', pay_meth: '', address: '' })
 
 async function fetchData() {
   loading.value = true
@@ -87,7 +103,7 @@ async function fetchData() {
 function handleSearch() { pagination.page = 1; fetchData() }
 function handleReset() { searchForm.keyword = ''; pagination.page = 1; fetchData() }
 
-function handleEdit(row: any) { editId.value = row.id; Object.assign(form, { phone: row.phone, email: row.email, status: row.status }); dialogVisible.value = true }
+function handleEdit(row: any) { editId.value = row.id; Object.assign(form, { usertel: row.usertel, idcard: row.idcard, banknum: row.banknum, bankuser: row.bankuser, city_name: row.city_name, bank_name: row.bank_name, pay_meth: row.pay_meth, address: row.address }); dialogVisible.value = true }
 
 async function handleSubmit() {
   submitLoading.value = true

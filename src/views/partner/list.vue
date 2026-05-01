@@ -67,12 +67,12 @@
         <el-row :gutter="20">
           <el-col :span="12">
             <el-form-item label="状态">
-              <el-switch v-model="form.status" />
+              <el-switch v-model="form.status" :active-value="1" :inactive-value="0" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="代理商ID">
-              <el-input v-model="form.agent_id" placeholder="代理商ID" />
+            <el-form-item label="合作伙伴ID">
+              <el-input v-model="form.partner_id" placeholder="合作伙伴ID" />
             </el-form-item>
           </el-col>
         </el-row>
@@ -101,7 +101,7 @@ const formRef = ref<FormInstance>()
 const searchForm = reactive({ keyword: '' })
 const pagination = reactive({ page: 1, pageSize: 10, total: 0 })
 
-const defaultForm = { company: '', contact: '', usertel: '', city_id: '' as any, address: '', info: '', status: true, agent_id: '' }
+const defaultForm = { company: '', contact: '', usertel: '', city_id: '' as any, address: '', info: '', status: true, partner_id: '' }
 const form = reactive({ ...defaultForm })
 const cityList = ref<any[]>([])
 
@@ -133,7 +133,7 @@ function handleEdit(row: any) {
   isEdit.value = true; editId.value = row.id
   Object.assign(form, {
     company: row.company, contact: row.contact, usertel: row.usertel, city_id: row.city_id,
-    address: row.address, info: row.info, status: !!row.status, agent_id: row.agent_id ?? '',
+    address: row.address, info: row.info, status: !!row.status, partner_id: row.partner_id ?? '',
   })
   dialogVisible.value = true
 }

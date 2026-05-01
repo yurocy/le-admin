@@ -96,10 +96,10 @@
           <el-input v-model="form.product_img" placeholder="请输入图片URL" />
         </el-form-item>
         <el-form-item label="热门" prop="ishot">
-          <el-switch v-model="form.ishot" />
+          <el-switch v-model="form.ishot" :active-value="1" :inactive-value="0" />
         </el-form-item>
         <el-form-item label="显示" prop="display">
-          <el-switch v-model="form.display" />
+          <el-switch v-model="form.display" :active-value="1" :inactive-value="0" />
         </el-form-item>
         <el-form-item label="排序" prop="sort">
           <el-input-number v-model="form.sort" :min="0" />

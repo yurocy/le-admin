@@ -5,30 +5,32 @@
         <span>网站配置</span>
       </template>
       <el-form ref="formRef" :model="form" label-position="top" style="max-width: 700px">
+        <el-form-item label="网站标题">
+          <el-input v-model="form.webtitle" placeholder="网站标题" />
+        </el-form-item>
         <el-form-item label="网站名称">
-          <el-input v-model="form.site_name" placeholder="网站名称" />
+          <el-input v-model="form.webname" placeholder="网站名称" />
         </el-form-item>
         <el-form-item label="网站描述">
-          <el-input v-model="form.site_desc" type="textarea" :rows="2" placeholder="网站描述" />
+          <el-input v-model="form.webdesc" type="textarea" :rows="2" placeholder="网站描述" />
         </el-form-item>
-        <el-form-item label="Logo">
-          <el-input v-model="form.logo" placeholder="Logo URL" />
+        <el-form-item label="网站URL">
+          <el-input v-model="form.url" placeholder="网站URL" />
+        </el-form-item>
+        <el-form-item label="SEO关键词">
+          <el-input v-model="form.webkey" placeholder="SEO关键词，多个用逗号分隔" />
         </el-form-item>
         <el-form-item label="ICP备案号">
-          <el-input v-model="form.icp" placeholder="ICP备案号" />
+          <el-input v-model="form.record" placeholder="ICP备案号" />
         </el-form-item>
-        <el-form-item label="关键词">
-          <el-input v-model="form.keywords" placeholder="SEO关键词，多个用逗号分隔" />
+        <el-form-item label="覆盖城市">
+          <el-input v-model="form.covered_city" placeholder="覆盖城市" />
         </el-form-item>
-        <el-divider content-position="left">联系方式</el-divider>
-        <el-form-item label="联系电话">
-          <el-input v-model="form.contact_phone" placeholder="联系电话" />
+        <el-form-item label="奖项">
+          <el-input v-model="form.award" placeholder="奖项信息" />
         </el-form-item>
-        <el-form-item label="联系QQ">
-          <el-input v-model="form.contact_qq" placeholder="联系QQ" />
-        </el-form-item>
-        <el-form-item label="联系微信">
-          <el-input v-model="form.contact_wechat" placeholder="联系微信" />
+        <el-form-item label="奖项限额">
+          <el-input-number v-model="form.award_limit" :min="0" />
         </el-form-item>
         <el-form-item label="地址">
           <el-input v-model="form.address" placeholder="公司地址" />
@@ -53,8 +55,9 @@ const loading = ref(false)
 const submitLoading = ref(false)
 
 const defaultConfig = {
-  site_name: '', site_desc: '', logo: '', icp: '', keywords: '',
-  contact_phone: '', contact_qq: '', contact_wechat: '', address: '', copyright: '',
+  webtitle: '', webname: '', webdesc: '', url: '', webkey: '',
+  record: '', covered_city: '', award: '', award_limit: 0,
+  address: '', copyright: '',
 }
 
 const form = reactive({ ...defaultConfig })

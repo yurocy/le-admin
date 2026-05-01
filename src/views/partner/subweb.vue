@@ -12,9 +12,11 @@
 
     <el-table :data="tableData" v-loading="loading" border stripe>
       <el-table-column prop="id" label="ID" width="70" />
-      <el-table-column prop="name" label="名称" min-width="140" />
-      <el-table-column prop="domain" label="域名" min-width="180" show-overflow-tooltip />
-      <el-table-column prop="partner_id" label="合作伙伴ID" width="120" />
+      <el-table-column prop="title" label="站点标题" min-width="140" />
+      <el-table-column prop="username" label="用户名" width="120" />
+      <el-table-column prop="usertel" label="电话" width="130" />
+      <el-table-column prop="key" label="密钥" min-width="180" show-overflow-tooltip />
+      <el-table-column prop="ratio" label="分成比例" width="100" align="center" />
       <el-table-column label="状态" width="80">
         <template #default="{ row }">
           <el-tag :type="row.status ? 'success' : 'danger'">{{ row.status ? '启用' : '禁用' }}</el-tag>
@@ -42,20 +44,23 @@
 
     <el-dialog v-model="dialogVisible" :title="isEdit ? '编辑子站' : '添加子站'" width="500px" destroy-on-close>
       <el-form ref="formRef" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="名称" prop="name">
-          <el-input v-model="form.name" placeholder="请输入子站名称" />
+        <el-form-item label="站点标题" prop="title">
+          <el-input v-model="form.title" placeholder="请输入站点标题" />
         </el-form-item>
-        <el-form-item label="域名" prop="domain">
-          <el-input v-model="form.domain" placeholder="请输入域名" />
+        <el-form-item label="用户名" prop="username">
+          <el-input v-model="form.username" placeholder="请输入用户名" />
         </el-form-item>
-        <el-form-item label="合作伙伴" prop="partner_id">
-          <el-input v-model="form.partner_id" placeholder="合作伙伴ID" />
+        <el-form-item label="电话" prop="usertel">
+          <el-input v-model="form.usertel" placeholder="请输入电话" />
         </el-form-item>
-        <el-form-item label="信息">
-          <el-input v-model="form.info" type="textarea" :rows="3" />
+        <el-form-item label="密钥" prop="key">
+          <el-input v-model="form.key" placeholder="请输入密钥" />
+        </el-form-item>
+        <el-form-item label="分成比例" prop="ratio">
+          <el-input-number v-model="form.ratio" :min="0" :max="100" :precision="1" style="width: 100%" />
         </el-form-item>
         <el-form-item label="状态">
-          <el-switch v-model="form.status" />
+          <el-switch v-model="form.status" :active-value="1" :inactive-value="0" />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -82,12 +87,12 @@ const formRef = ref<FormInstance>()
 const searchForm = reactive({ keyword: '' })
 const pagination = reactive({ page: 1, pageSize: 10, total: 0 })
 
-const defaultForm = { name: '', domain: '', partner_id: '', info: '', status: true }
+const defaultForm = { title: '', username: '', usertel: '', key: '', ratio: 0, status: 1 }
 const form = reactive({ ...defaultForm })
 
 const rules = {
-  name: [{ required: true, message: '请输入名称', trigger: 'blur' }],
-  domain: [{ required: true, message: '请输入域名', trigger: 'blur' }],
+  title: [{ required: true, message: '请输入站点标题', trigger: 'blur' }],
+  username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
 }
 
 async function fetchData() {
@@ -112,7 +117,7 @@ function handleAdd() {
 
 function handleEdit(row: any) {
   isEdit.value = true; editId.value = row.id
-  Object.assign(form, { name: row.name, domain: row.domain, partner_id: row.partner_id ?? '', info: row.info, status: row.status })
+  Object.assign(form, { title: row.title, username: row.username, usertel: row.usertel, key: row.key, ratio: row.ratio, status: row.status })
   dialogVisible.value = true
 }
 

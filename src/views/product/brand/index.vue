@@ -68,10 +68,10 @@
           <el-input-number v-model="form.sort" :min="0" />
         </el-form-item>
         <el-form-item label="热门" prop="ishot">
-          <el-switch v-model="form.ishot" />
+          <el-switch v-model="form.ishot" :active-value="1" :inactive-value="0" />
         </el-form-item>
         <el-form-item label="上架" prop="onsale">
-          <el-switch v-model="form.onsale" />
+          <el-switch v-model="form.onsale" :active-value="1" :inactive-value="0" />
         </el-form-item>
       </el-form>
       <template #footer>

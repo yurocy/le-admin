@@ -82,7 +82,7 @@
         <el-row :gutter="20">
           <el-col :span="12">
             <el-form-item label="状态">
-              <el-switch v-model="form.status" />
+              <el-switch v-model="form.status" :active-value="1" :inactive-value="0" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
