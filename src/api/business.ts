@@ -166,6 +166,7 @@ export const articleApi = {
   updateArticle: (id: number, data: any) => request.put(`/article/article/${id}`, data),
   deleteArticle: (id: number) => request.delete(`/article/article/${id}`),
   listComment: (params?: any) => request.get('/article/comment', { params }),
+  createComment: (data: any) => request.post('/article/comment', data),
   deleteComment: (id: number) => request.delete(`/article/comment/${id}`),
 }
 

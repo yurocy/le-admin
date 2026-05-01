@@ -8,6 +8,8 @@
       </el-select>
       <el-button type="primary" @click="handleSearch">搜索</el-button>
       <el-button @click="handleReset">重置</el-button>
+      <div style="flex: 1" />
+      <el-button type="primary" @click="handleAdd">添加评论</el-button>
     </div>
 
     <el-table :data="tableData" v-loading="loading" border stripe>
@@ -30,7 +32,7 @@
         </template>
       </el-table-column>
       <el-table-column prop="ip" label="IP" width="130" />
-      <el-table-column label="评分" width="80">
+      <el-table-column label="评分" width="100" align="center">
         <template #default="{ row }">
           <el-rate v-model="row.mark" disabled />
         </template>
@@ -54,13 +56,45 @@
         @current-change="fetchData"
       />
     </div>
+
+    <!-- 添加评论对话框 -->
+    <el-dialog v-model="dialogVisible" title="添加评论" width="500px" destroy-on-close>
+      <el-form ref="formRef" :model="form" :rules="rules" label-width="90px">
+        <el-form-item label="评论类型" prop="type">
+          <el-select v-model="form.type" placeholder="请选择" style="width: 100%">
+            <el-option label="产品评论" :value="1" />
+            <el-option label="文章评论" :value="2" />
+            <el-option label="其他" :value="0" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="用户电话" prop="usertel">
+          <el-input v-model="form.usertel" placeholder="用户电话" />
+        </el-form-item>
+        <el-form-item label="关联订单">
+          <el-input v-model="form.order_id" placeholder="订单ID（可选）" />
+        </el-form-item>
+        <el-form-item label="评论内容" prop="content">
+          <el-input v-model="form.content" type="textarea" :rows="3" placeholder="评论内容" />
+        </el-form-item>
+        <el-form-item label="评分">
+          <el-rate v-model="form.mark" show-text :texts="['很差', '差', '一般', '好', '很好']" />
+        </el-form-item>
+        <el-form-item label="IP">
+          <el-input v-model="form.ip" placeholder="IP地址（可选）" />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="dialogVisible = false">取消</el-button>
+        <el-button type="primary" :loading="submitLoading" @click="handleSubmit">确定</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessage, ElMessageBox, type FormInstance } from 'element-plus'
 import { articleApi } from '@/api/business'
 
 const router = useRouter()
@@ -68,10 +102,29 @@ const router = useRouter()
 const typeMap: Record<number, string> = { 0: '其他', 1: '产品评论', 2: '文章评论' }
 
 const loading = ref(false)
+const submitLoading = ref(false)
 const tableData = ref<any[]>([])
+const dialogVisible = ref(false)
+const formRef = ref<FormInstance>()
 
 const searchForm = reactive({ type: '' as any })
 const pagination = reactive({ page: 1, pageSize: 10, total: 0 })
+
+const defaultForm = {
+  type: 0,
+  usertel: '',
+  order_id: '',
+  content: '',
+  mark: 5,
+  ip: '',
+}
+
+const form = reactive({ ...defaultForm })
+
+const rules = {
+  type: [{ required: true, message: '请选择评论类型', trigger: 'change' }],
+  content: [{ required: true, message: '请输入评论内容', trigger: 'blur' }],
+}
 
 async function fetchData() {
   loading.value = true
@@ -90,6 +143,32 @@ function handleReset() { searchForm.type = ''; pagination.page = 1; fetchData() 
 function goOrder(orderId: number) {
   if (!orderId) return
   router.push({ path: '/product/order', query: { id: orderId } })
+}
+
+function handleAdd() {
+  Object.assign(form, { ...defaultForm })
+  dialogVisible.value = true
+}
+
+async function handleSubmit() {
+  await formRef.value?.validate()
+  submitLoading.value = true
+  try {
+    const data: any = {
+      type: form.type,
+      usertel: form.usertel,
+      content: form.content,
+      mark: form.mark,
+      ip: form.ip || undefined,
+    }
+    if (form.order_id) {
+      data.order_id = parseInt(form.order_id) || undefined
+    }
+    await articleApi.createComment(data)
+    ElMessage.success('添加成功')
+    dialogVisible.value = false
+    fetchData()
+  } catch { ElMessage.error('操作失败') } finally { submitLoading.value = false }
 }
 
 async function handleDelete(row: any) {
