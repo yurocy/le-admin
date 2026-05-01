@@ -225,17 +225,39 @@
         <!-- 图片 -->
         <el-divider content-position="left">检测图片</el-divider>
         <el-row :gutter="16">
-          <el-col :span="6" v-for="(img, idx) in [form.image1, form.image2, form.image3, form.image4]" :key="idx">
-            <el-form-item :label="`图片${idx + 1}`">
+          <el-col :span="6" v-for="idx in 4" :key="idx">
+            <el-form-item :label="`图片${idx}`">
               <div class="order-image-item">
-                <el-image
-                  v-if="img"
-                  :src="img"
-                  style="width: 80px; height: 80px"
-                  fit="cover"
-                  :preview-src-list="[img]"
-                />
-                <span v-else class="no-image">暂无</span>
+                <el-upload
+                  class="order-img-uploader"
+                  action="/api/uploadFile"
+                  name="file"
+                  :show-file-list="false"
+                  accept="image/*"
+                  :on-success="(res: any) => onImageUpload(res, idx)"
+                >
+                  <el-image
+                    v-if="form[`image${idx}`]"
+                    :src="form[`image${idx}`]"
+                    style="width: 80px; height: 80px"
+                    fit="cover"
+                    :preview-src-list="[form[`image${idx}`]]"
+                  />
+                  <div v-else class="no-image">
+                    <el-icon><Plus /></el-icon>
+                    <span>上传</span>
+                  </div>
+                </el-upload>
+                <el-button
+                  v-if="form[`image${idx}`]"
+                  class="img-del-btn"
+                  type="danger"
+                  size="small"
+                  circle
+                  @click="form[`image${idx}`] = ''"
+                >
+                  <el-icon><Close /></el-icon>
+                </el-button>
               </div>
             </el-form-item>
           </el-col>
@@ -279,6 +301,7 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, type FormInstance } from 'element-plus'
+import { Plus, Close } from '@element-plus/icons-vue'
 import { productApi } from '@/api/business'
 
 const statusMap: Record<number, string> = {
@@ -454,6 +477,15 @@ async function handleEdit(row: any) {
   dialogVisible.value = true
 }
 
+function onImageUpload(res: any, idx: number) {
+  if (res.code === 0 && res.data?.url) {
+    form[`image${idx}`] = res.data.url
+    ElMessage.success('上传成功')
+  } else {
+    ElMessage.error(res.message || '上传失败')
+  }
+}
+
 async function handleSubmit() {
   submitLoading.value = true
   try {
@@ -505,17 +537,44 @@ onMounted(() => {
 
 <style lang="scss" scoped>
 .order-image-item {
-  .no-image {
+  position: relative;
+  display: inline-block;
+  :deep(.order-img-uploader .el-upload) {
+    border: 1px dashed #dcdfe6;
+    border-radius: 4px;
+    cursor: pointer;
+    overflow: hidden;
+    width: 80px;
+    height: 80px;
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 80px;
-    height: 80px;
-    background: #f5f7fa;
-    border: 1px dashed #dcdfe6;
-    border-radius: 4px;
+    transition: border-color 0.2s;
+    &:hover {
+      border-color: #409eff;
+    }
+  }
+  .no-image {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
     color: #c0c4cc;
     font-size: 12px;
+    .el-icon {
+      font-size: 20px;
+    }
+  }
+  .img-del-btn {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    z-index: 1;
+    width: 18px;
+    height: 18px;
+    min-height: 18px;
+    padding: 0;
   }
 }
 </style>
