@@ -101,7 +101,7 @@
                     <span v-else>{{ row.info || '-' }}</span>
                   </template>
                 </el-table-column>
-                <el-table-column label="图片" width="120" align="center">
+                <el-table-column label="图片" width="100" align="center">
                   <template #default="{ row }">
                     <el-image
                       v-if="getOptImage(row.image_id)"
@@ -110,23 +110,24 @@
                       fit="cover"
                       :preview-src-list="[getOptImage(row.image_id).image]"
                     />
-                    <el-select
+                    <el-upload
                       v-if="row._editing"
-                      v-model="row.image_id"
-                      placeholder="选图片"
-                      size="small"
-                      clearable
-                      style="width: 100%"
+                      class="option-image-uploader"
+                      action="/api/uploadFile"
+                      name="file"
+                      :show-file-list="false"
+                      accept="image/*"
+                      :on-success="(res: any) => onOptionImageUpload(res, row)"
                     >
-                      <el-option
-                        v-for="img in imageList"
-                        :key="img.id"
-                        :label="img.name"
-                        :value="img.id"
+                      <el-image
+                        v-if="getOptImage(row.image_id)"
+                        :src="getOptImage(row.image_id).image"
+                        style="width: 40px; height: 40px"
+                        fit="cover"
                       />
-                    </el-select>
-                    <span v-else-if="getOptImage(row.image_id)">{{ getOptImage(row.image_id).name }}</span>
-                    <span v-else>-</span>
+                      <el-icon v-else class="option-upload-icon"><Plus /></el-icon>
+                    </el-upload>
+                    <span v-else-if="!getOptImage(row.image_id)">-</span>
                   </template>
                 </el-table-column>
                 <el-table-column label="排序" width="80" align="center">
@@ -511,6 +512,31 @@ async function saveAll() {
   finally { submitLoading.value = false }
 }
 
+// ==================== Option Image Upload ====================
+
+async function onOptionImageUpload(res: any, row: DescOptionItem) {
+  if (res.code === 0 && res.data?.url) {
+    try {
+      // 自动创建图片到图片库，并关联 image_id
+      const imgRes: any = await productApi.createDescImage({
+        name: `${row.text || '条目图片'}_${Date.now()}`,
+        image: res.data.url,
+        textinfo: '',
+      })
+      const newImg = imgRes.data || imgRes
+      if (newImg?.id) {
+        row.image_id = newImg.id
+        imageList.value.push(newImg)
+        ElMessage.success('上传成功')
+      }
+    } catch {
+      ElMessage.error('保存图片到图片库失败')
+    }
+  } else {
+    ElMessage.error(res.message || '上传失败')
+  }
+}
+
 // ==================== Image CRUD ====================
 
 async function fetchImages() {
@@ -650,6 +676,28 @@ onMounted(() => { fetchData() })
   }
   .desc-upload-icon {
     font-size: 28px;
+    color: #8c939d;
+  }
+}
+
+.option-image-uploader {
+  :deep(.el-upload) {
+    border: 1px dashed #c0c4cc;
+    border-radius: 4px;
+    cursor: pointer;
+    overflow: hidden;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color 0.2s;
+    &:hover {
+      border-color: #409eff;
+    }
+  }
+  .option-upload-icon {
+    font-size: 18px;
     color: #8c939d;
   }
 }
