@@ -145,8 +145,8 @@ const form = reactive({
   new_price: 0,
   price7: '',
   product_img: '',
-  ishot: false,
-  display: true,
+  ishot: 0,
+  display: 1,
   sort: 0,
   search_text: '',
 })
@@ -209,7 +209,7 @@ function handleAdd() {
   Object.assign(form, {
     product_name: '', model: '', brand_id: '', desc_id: '',
     product_price: 0, lowest_price: 0, new_price: 0, price7: '',
-    product_img: '', ishot: false, display: true, sort: 0, search_text: '',
+    product_img: '', ishot: 0, display: 1, sort: 0, search_text: '',
   })
   dialogVisible.value = true
 }

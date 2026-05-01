@@ -121,7 +121,7 @@ const pagination = reactive({ page: 1, pageSize: 10, total: 0 })
 
 const defaultForm = {
   username: '', password: '', company: '', contact: '', usertel: '', city: '',
-  address: '', bank: '', bname: '', bnum: '', status: true, deposit: 0, info: '',
+  address: '', bank: '', bname: '', bnum: '', status: 1, deposit: 0, info: '',
 }
 
 const form = reactive({ ...defaultForm })
@@ -171,7 +171,7 @@ function handleEdit(row: any) {
   Object.assign(form, {
     username: row.username, password: '', company: row.company, contact: row.contact,
     usertel: row.usertel, city: row.city, address: row.address, bank: row.bank,
-    bname: row.bname, bnum: row.bnum, status: !!row.status, deposit: row.deposit, info: row.info,
+    bname: row.bname, bnum: row.bnum, status: row.status || 0, deposit: row.deposit, info: row.info,
   })
   dialogVisible.value = true
 }

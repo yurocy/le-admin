@@ -95,7 +95,7 @@ const formRef = ref<FormInstance>()
 const searchForm = reactive({ keyword: '', status: '' as any })
 const pagination = reactive({ page: 1, pageSize: 10, total: 0 })
 
-const defaultForm = { name: '', usertel: '', password: '', city_id: '' as any, info: '', status: true }
+const defaultForm = { name: '', usertel: '', password: '', city_id: '' as any, info: '', status: 1 }
 const form = reactive({ ...defaultForm })
 const cityList = ref<any[]>([])
 
@@ -131,7 +131,7 @@ function handleAdd() {
 
 function handleEdit(row: any) {
   isEdit.value = true; editId.value = row.id
-  Object.assign(form, { name: row.name, usertel: row.usertel, password: '', city_id: row.city_id, info: row.info, status: !!row.status })
+  Object.assign(form, { name: row.name, usertel: row.usertel, password: '', city_id: row.city_id, info: row.info, status: row.status || 0 })
   dialogVisible.value = true
 }
 

@@ -76,7 +76,7 @@ const form = reactive({
   outtime: '',
   info: '',
   sort: 0,
-  status: true,
+  status: 1,
 })
 
 const rules = {
@@ -99,7 +99,7 @@ async function fetchData() {
 function handleAdd() {
   isEdit.value = false
   editId.value = 0
-  Object.assign(form, { title: '', price: 0, limit: 0, outtime: '', info: '', sort: 0, status: true })
+  Object.assign(form, { title: '', price: 0, limit: 0, outtime: '', info: '', sort: 0, status: 1 })
   dialogVisible.value = true
 }
 

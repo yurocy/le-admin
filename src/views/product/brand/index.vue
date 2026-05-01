@@ -104,8 +104,8 @@ const form = reactive({
   name: '',
   image: '',
   sort: 0,
-  ishot: false,
-  onsale: true,
+  ishot: 0,
+  onsale: 1,
 })
 
 const rules = {
@@ -150,7 +150,7 @@ function handleSearch() {
 function handleAdd() {
   isEdit.value = false
   editId.value = 0
-  Object.assign(form, { type_id: '', name: '', image: '', sort: 0, ishot: false, onsale: true })
+  Object.assign(form, { type_id: '', name: '', image: '', sort: 0, ishot: 0, onsale: 1 })
   dialogVisible.value = true
 }
 

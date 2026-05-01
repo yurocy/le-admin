@@ -72,7 +72,7 @@
           </el-col>
           <el-col :span="12">
             <el-form-item label="热门">
-              <el-switch v-model="form.ishot" active-text="是" inactive-text="否" />
+              <el-switch v-model="form.ishot" :active-value="1" :inactive-value="0" active-text="是" inactive-text="否" />
             </el-form-item>
           </el-col>
         </el-row>
@@ -132,7 +132,7 @@ onBeforeUnmount(() => {
 const searchForm = reactive({ keyword: '', category_id: '' as any })
 const pagination = reactive({ page: 1, pageSize: 10, total: 0 })
 
-const defaultForm = { title: '', category_id: '' as any, date: '', keyword: '', info: '', content: '', ishot: false }
+const defaultForm = { title: '', category_id: '' as any, date: '', keyword: '', info: '', content: '', ishot: 0 }
 const form = reactive({ ...defaultForm })
 
 const rules = {
@@ -180,7 +180,7 @@ async function handleEdit(row: any) {
   // 先用列表数据填充基本信息，再拉取详情获取 content
   Object.assign(form, {
     title: row.title, category_id: row.category_id, date: row.date,
-    keyword: row.keyword, info: row.info, content: '', ishot: !!row.ishot,
+    keyword: row.keyword, info: row.info, content: '', ishot: row.ishot || 0,
   })
   dialogVisible.value = true
   // 加载文章详情（含 content）

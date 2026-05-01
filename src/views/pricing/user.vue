@@ -94,7 +94,7 @@ const formRef = ref<FormInstance>()
 const searchForm = reactive({ keyword: '', status: '' as any })
 const pagination = reactive({ page: 1, pageSize: 10, total: 0 })
 
-const defaultForm = { username: '', password: '', usertel: '', company: '', address: '', status: true }
+const defaultForm = { username: '', password: '', usertel: '', company: '', address: '', status: 1 }
 const form = reactive({ ...defaultForm })
 
 const rules: any = {
@@ -118,7 +118,7 @@ function handleSearch() { pagination.page = 1; fetchData() }
 function handleReset() { Object.assign(searchForm, { keyword: '', status: '' }); pagination.page = 1; fetchData() }
 
 function handleAdd() { isEdit.value = false; editId.value = 0; Object.assign(form, { ...defaultForm }); dialogVisible.value = true }
-function handleEdit(row: any) { isEdit.value = true; editId.value = row.id; Object.assign(form, { username: row.username, password: '', usertel: row.usertel, company: row.company, address: row.address, status: !!row.status }); dialogVisible.value = true }
+function handleEdit(row: any) { isEdit.value = true; editId.value = row.id; Object.assign(form, { username: row.username, password: '', usertel: row.usertel, company: row.company, address: row.address, status: row.status || 0 }); dialogVisible.value = true }
 
 async function handleSubmit() {
   await formRef.value?.validate()

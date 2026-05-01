@@ -109,7 +109,7 @@ const form = reactive({
   amount: 0,
   level_id: '' as any,
   desc: '',
-  status: true,
+  status: 1,
   info: '',
 })
 
@@ -166,7 +166,7 @@ function handleReset() {
 function handleAdd() {
   isEdit.value = false
   editId.value = 0
-  Object.assign(form, { brand_id: '', productname: '', amount: 0, level_id: '', desc: '', status: true, info: '' })
+  Object.assign(form, { brand_id: '', productname: '', amount: 0, level_id: '', desc: '', status: 1, info: '' })
   dialogVisible.value = true
 }
 
@@ -175,7 +175,7 @@ function handleEdit(row: any) {
   editId.value = row.id
   Object.assign(form, {
     brand_id: row.brand_id, productname: row.productname, amount: row.amount,
-    level_id: row.level_id, desc: row.desc, status: !!row.status, info: row.info,
+    level_id: row.level_id, desc: row.desc, status: row.status || 0, info: row.info,
   })
   dialogVisible.value = true
 }

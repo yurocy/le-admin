@@ -8,6 +8,12 @@
       <el-table-column prop="id" label="ID" width="80" />
       <el-table-column prop="name" label="名称" min-width="200" />
       <el-table-column prop="sort" label="排序" width="100" />
+      <el-table-column prop="icon" label="图标" min-width="120" show-overflow-tooltip />
+      <el-table-column label="状态" width="80">
+        <template #default="{ row }">
+          <el-tag :type="row.status ? 'success' : 'danger'">{{ row.status ? '启用' : '禁用' }}</el-tag>
+        </template>
+      </el-table-column>
       <el-table-column label="操作" width="180" fixed="right">
         <template #default="{ row }">
           <el-button type="primary" link @click="handleEdit(row)">编辑</el-button>
@@ -23,6 +29,12 @@
         </el-form-item>
         <el-form-item label="排序" prop="sort">
           <el-input-number v-model="form.sort" :min="0" />
+        </el-form-item>
+        <el-form-item label="图标">
+          <el-input v-model="form.icon" placeholder="图标URL" />
+        </el-form-item>
+        <el-form-item label="状态">
+          <el-switch v-model="form.status" :active-value="1" :inactive-value="0" />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -46,7 +58,7 @@ const isEdit = ref(false)
 const editId = ref<number>(0)
 const formRef = ref<FormInstance>()
 
-const form = reactive({ name: '', sort: 0 })
+const form = reactive({ name: '', sort: 0, icon: '', status: 1 })
 const rules = { name: [{ required: true, message: '请输入分类名称', trigger: 'blur' }] }
 
 async function fetchData() {
@@ -54,8 +66,8 @@ async function fetchData() {
   try { const res: any = await biddingApi.listCategory(); tableData.value = res.data || res || [] } catch { ElMessage.error('获取分类列表失败') } finally { loading.value = false }
 }
 
-function handleAdd() { isEdit.value = false; editId.value = 0; Object.assign(form, { name: '', sort: 0 }); dialogVisible.value = true }
-function handleEdit(row: any) { isEdit.value = true; editId.value = row.id; Object.assign(form, { name: row.name, sort: row.sort }); dialogVisible.value = true }
+function handleAdd() { isEdit.value = false; editId.value = 0; Object.assign(form, { name: '', sort: 0, icon: '', status: 1 }); dialogVisible.value = true }
+function handleEdit(row: any) { isEdit.value = true; editId.value = row.id; Object.assign(form, { name: row.name, sort: row.sort, icon: row.icon, status: row.status || 0 }); dialogVisible.value = true }
 
 async function handleSubmit() {
   await formRef.value?.validate()

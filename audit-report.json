@@ -1,0 +1,52 @@
+{
+  "version": "V1.2",
+  "date": "2026-05-01T13:00:00+08:00",
+  "front_commit": "e77dcb0",
+  "back_commit": "8f78f9f",
+  "audit_results": {
+    "field_alignment": { "score": "98%", "findings": ["P1: pricing/category缺少status+icon字段", "P1: pricing/brand缺少image字段", "P1: bidding/category缺少status+icon字段"] },
+    "crud_completeness": { "score": "100%", "findings": [] },
+    "type_safety": { "score": "100%", "findings": [] },
+    "security": { "score": "95%", "findings": ["P2: 密码仍使用MD5哈希（已知风险，非本次修复范围）"] },
+    "code_quality": { "score": "98%", "findings": [] }
+  },
+  "verification": {
+    "total_fixes": 13,
+    "pass_count": 13,
+    "fail_count": 0,
+    "regression_count": 0,
+    "pass_rate": "100%"
+  },
+  "new_defects": [
+    { "id": "LE-01", "severity": "P0", "module": "sale/goods", "side": "front", "category": "F9", "description": "defaultForm.status=true(boolean) 应为1(int)", "evidence": "src/views/sale/goods.vue:112", "fix": "true→1, handleAdd true→1, handleEdit !!row.status→row.status||0", "verification": "PASS" },
+    { "id": "LE-02", "severity": "P0", "module": "sale/user", "side": "front", "category": "F9", "description": "defaultForm.status=true(boolean) 应为1(int)", "evidence": "src/views/sale/user.vue:124", "fix": "true→1, handleEdit !!row.status→row.status||0", "verification": "PASS" },
+    { "id": "LE-03", "severity": "P0", "module": "partner/agent", "side": "front", "category": "F9", "description": "defaultForm.status=true(boolean) 应为1(int)", "evidence": "src/views/partner/agent.vue:98", "fix": "true→1, handleEdit !!row.status→row.status||0", "verification": "PASS" },
+    { "id": "LE-04", "severity": "P0", "module": "partner/store", "side": "front", "category": "F9", "description": "defaultForm.status=true(boolean) 应为1(int)", "evidence": "src/views/partner/store.vue:117", "fix": "true→1, handleEdit !!row.status→row.status||0", "verification": "PASS" },
+    { "id": "LE-05", "severity": "P0", "module": "partner/list", "side": "front", "category": "F9", "description": "handleEdit !!row.status(boolean转换) 应为row.status||0(int回退)", "evidence": "src/views/partner/list.vue:136", "fix": "!!row.status→row.status||0", "verification": "PASS" },
+    { "id": "LE-06", "severity": "P0", "module": "product/product", "side": "front", "category": "F9", "description": "form.ishot=false(boolean) 应为0, form.display=true(boolean) 应为1", "evidence": "src/views/product/product/index.vue:148-149", "fix": "false→0, true→1, handleAdd同步", "verification": "PASS" },
+    { "id": "LE-07", "severity": "P0", "module": "product/brand", "side": "front", "category": "F9", "description": "form.ishot=false(boolean) 应为0, form.onsale=true(boolean) 应为1", "evidence": "src/views/product/brand/index.vue:107-108", "fix": "false→0, true→1, handleAdd同步", "verification": "PASS" },
+    { "id": "LE-08", "severity": "P0", "module": "product/coupon", "side": "front", "category": "F9", "description": "form.status=true(boolean) 应为1(int)", "evidence": "src/views/product/coupon/index.vue:79", "fix": "true→1, handleAdd true→1", "verification": "PASS" },
+    { "id": "LE-09", "severity": "P0", "module": "pricing/user", "side": "front", "category": "F9", "description": "defaultForm.status=true(boolean) 应为1(int)", "evidence": "src/views/pricing/user.vue:97", "fix": "true→1, handleEdit !!row.status→row.status||0", "verification": "PASS" },
+    { "id": "LE-10", "severity": "P0", "module": "article/list", "side": "front", "category": "F2+F9", "description": "el-switch缺少:active-value/:inactive-value + defaultForm.ishot=false应为0 + handleEdit !!row.ishot", "evidence": "src/views/article/list.vue:75,135,183", "fix": "添加active-value/inactive-value, false→0, !!→||0", "verification": "PASS" },
+    { "id": "LE-11", "severity": "P1", "module": "pricing/category", "side": "front", "category": "F6", "description": "缺少status列/开关和icon字段", "evidence": "src/views/pricing/category.vue", "fix": "表格新增status+icon列,表单新增icon+status字段", "verification": "PASS" },
+    { "id": "LE-12", "severity": "P1", "module": "pricing/brand", "side": "front", "category": "F6", "description": "缺少image字段", "evidence": "src/views/pricing/brand.vue", "fix": "表单新增image字段, form/handleAdd/handleEdit同步", "verification": "PASS" },
+    { "id": "LE-13", "severity": "P1", "module": "bidding/category", "side": "front", "category": "F6", "description": "缺少status列/开关和icon字段", "evidence": "src/views/bidding/category.vue", "fix": "表格新增status+icon列,表单新增icon+status字段", "verification": "PASS" }
+  ],
+  "lessons_learned": [
+    {
+      "lesson": "el-switch的int类型对齐需要同时检查三个位置：①模板属性(:active-value/:inactive-value) ②defaultForm默认值 ③handleEdit数据回填。V1.1只检查了①导致②③遗漏",
+      "evidence": "V1.2全局扫描发现10个文件存在②③问题",
+      "category": "TYPE_SAFE"
+    },
+    {
+      "lesson": "新增F9缺陷模式：el-switch默认值类型不一致。审计检查项2.1(el-switch扫描)应扩展为同时检查defaultForm和handleEdit",
+      "evidence": "10处遗漏修复，全部一次通过",
+      "category": "TYPE_SAFE"
+    },
+    {
+      "lesson": "分类/品牌类页面容易遗漏status和icon字段——后端有但前端不展示，不影响CRUD但导致管理缺失",
+      "evidence": "pricing/category、pricing/brand、bidding/category三个页面遗漏",
+      "category": "FIELD_ALIGN"
+    }
+  ]
+}

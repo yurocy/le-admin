@@ -30,6 +30,9 @@
         <el-form-item label="排序" prop="sort">
           <el-input-number v-model="form.sort" :min="0" />
         </el-form-item>
+        <el-form-item label="图片">
+          <el-input v-model="form.image" placeholder="品牌图片URL" />
+        </el-form-item>
       </el-form>
       <template #footer>
         <el-button @click="dialogVisible = false">取消</el-button>
@@ -53,7 +56,7 @@ const isEdit = ref(false)
 const editId = ref<number>(0)
 const formRef = ref<FormInstance>()
 
-const form = reactive({ name: '', cid: '' as any, sort: 0 })
+const form = reactive({ name: '', cid: '' as any, image: '', sort: 0 })
 const rules = {
   name: [{ required: true, message: '请输入品牌名称', trigger: 'blur' }],
   cid: [{ required: true, message: '请选择分类', trigger: 'change' }],
@@ -68,8 +71,8 @@ async function fetchData() {
   try { const res: any = await pricingApi.listBrand(); tableData.value = res.data || res || [] } catch { ElMessage.error('获取品牌列表失败') } finally { loading.value = false }
 }
 
-function handleAdd() { isEdit.value = false; editId.value = 0; Object.assign(form, { name: '', cid: '', sort: 0 }); dialogVisible.value = true }
-function handleEdit(row: any) { isEdit.value = true; editId.value = row.id; Object.assign(form, { name: row.name, cid: row.cid, sort: row.sort }); dialogVisible.value = true }
+function handleAdd() { isEdit.value = false; editId.value = 0; Object.assign(form, { name: '', cid: '', image: '', sort: 0 }); dialogVisible.value = true }
+function handleEdit(row: any) { isEdit.value = true; editId.value = row.id; Object.assign(form, { name: row.name, cid: row.cid, image: row.image, sort: row.sort }); dialogVisible.value = true }
 
 async function handleSubmit() {
   await formRef.value?.validate()
