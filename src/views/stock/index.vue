@@ -33,6 +33,11 @@
       <el-table-column prop="allpay" label="总支付" width="100" align="right" />
       <el-table-column prop="outprice" label="出库价" width="100" align="right" />
       <el-table-column prop="profit" label="利润" width="100" align="right" />
+      <el-table-column label="状态" width="90" align="center">
+        <template #default="{ row }">
+          <el-tag :type="row.status === 1 ? 'success' : 'info'">{{ row.status === 1 ? '在库' : '已售' }}</el-tag>
+        </template>
+      </el-table-column>
       <el-table-column prop="agent_id" label="代理商ID" width="100" />
       <el-table-column prop="addtime" label="入库时间" width="170" />
       <el-table-column prop="saletime" label="售出时间" width="170" />
@@ -127,6 +132,12 @@
         <el-form-item label="代理商ID">
           <el-input v-model="form.agent_id" placeholder="代理商ID" />
         </el-form-item>
+        <el-form-item label="状态">
+          <el-radio-group v-model="form.status">
+            <el-radio :value="0">已售</el-radio>
+            <el-radio :value="1">在库</el-radio>
+          </el-radio-group>
+        </el-form-item>
         <el-divider content-position="left">快递信息</el-divider>
         <el-row :gutter="20">
           <el-col :span="12">
@@ -189,7 +200,7 @@ const pagination = reactive({ page: 1, pageSize: 10, total: 0 })
 const defaultForm = {
   number: '', productname: '', imei: '', assprice: 0, checkprice: 0, repay: 0,
   lastprice: 0, allpay: 0, outprice: 0, pay: '', dues: 0, activity: '', desc: '', info: '',
-  agent_id: '', exp_com: '', exp_order: '', exp_fee: 0, exp_safe: 0, exp_pay: 0,
+  agent_id: '', status: 1, exp_com: '', exp_order: '', exp_fee: 0, exp_safe: 0, exp_pay: 0,
 }
 
 const form = reactive({ ...defaultForm })
@@ -246,6 +257,7 @@ function handleEdit(row: any) {
     lastprice: row.lastprice ?? 0, allpay: row.allpay ?? 0, outprice: row.outprice ?? 0,
     pay: row.pay ?? '', dues: row.dues ?? 0, activity: row.activity ?? '',
     desc: row.desc ?? '', info: row.info ?? '', agent_id: row.agent_id ?? '',
+    status: row.status ?? 0,
     exp_com: row.exp_com ?? '', exp_order: row.exp_order ?? '',
     exp_fee: row.exp_fee ?? 0, exp_safe: row.exp_safe ?? 0, exp_pay: row.exp_pay ?? 0,
   })
