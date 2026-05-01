@@ -18,6 +18,12 @@
         </template>
       </el-table-column>
       <el-table-column prop="usertel" label="用户电话" width="130" />
+      <el-table-column label="关联订单" width="170">
+        <template #default="{ row }">
+          <el-button v-if="row.order_no" type="primary" link @click="goOrder(row.order_id)">{{ row.order_no }}</el-button>
+          <span v-else>-</span>
+        </template>
+      </el-table-column>
       <el-table-column label="内容" min-width="250" show-overflow-tooltip>
         <template #default="{ row }">
           {{ row.content && row.content.length > 80 ? row.content.slice(0, 80) + '...' : row.content }}
@@ -53,8 +59,11 @@
 
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { articleApi } from '@/api/business'
+
+const router = useRouter()
 
 const typeMap: Record<number, string> = { 0: '其他', 1: '产品评论', 2: '文章评论' }
 
@@ -77,6 +86,11 @@ async function fetchData() {
 
 function handleSearch() { pagination.page = 1; fetchData() }
 function handleReset() { searchForm.type = ''; pagination.page = 1; fetchData() }
+
+function goOrder(orderId: number) {
+  if (!orderId) return
+  router.push({ path: '/product/order', query: { id: orderId } })
+}
 
 async function handleDelete(row: any) {
   try {
