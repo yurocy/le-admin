@@ -2,9 +2,8 @@
   <div class="page-container">
     <div class="search-bar">
       <el-select v-model="searchForm.type" placeholder="类型" clearable style="width: 120px">
-        <el-option label="产品评论" :value="1" />
-        <el-option label="文章评论" :value="2" />
-        <el-option label="其他" :value="0" />
+        <el-option label="订单" :value="0" />
+        <el-option label="代理" :value="1" />
       </el-select>
       <el-button type="primary" @click="handleSearch">搜索</el-button>
       <el-button @click="handleReset">重置</el-button>
@@ -16,7 +15,7 @@
       <el-table-column prop="id" label="ID" width="70" />
       <el-table-column label="类型" width="100">
         <template #default="{ row }">
-          <el-tag :type="row.type === 1 ? '' : row.type === 2 ? 'success' : 'info'">{{ typeMap[row.type] || '其他' }}</el-tag>
+          <el-tag :type="row.type === 0 ? '' : 'success'">{{ typeMap[row.type] || '-' }}</el-tag>
         </template>
       </el-table-column>
       <el-table-column prop="usertel" label="用户电话" width="130" />
@@ -62,9 +61,8 @@
       <el-form ref="formRef" :model="form" :rules="rules" label-width="90px">
         <el-form-item label="评论类型" prop="type">
           <el-select v-model="form.type" placeholder="请选择" style="width: 100%">
-            <el-option label="产品评论" :value="1" />
-            <el-option label="文章评论" :value="2" />
-            <el-option label="其他" :value="0" />
+            <el-option label="订单" :value="0" />
+            <el-option label="代理" :value="1" />
           </el-select>
         </el-form-item>
         <el-form-item label="用户电话" prop="usertel">
@@ -99,7 +97,7 @@ import { articleApi } from '@/api/business'
 
 const router = useRouter()
 
-const typeMap: Record<number, string> = { 0: '其他', 1: '产品评论', 2: '文章评论' }
+const typeMap: Record<number, string> = { 0: '订单', 1: '代理' }
 
 const loading = ref(false)
 const submitLoading = ref(false)
