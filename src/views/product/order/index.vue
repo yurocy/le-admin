@@ -30,9 +30,12 @@
       <el-table-column prop="id" label="ID" width="60" />
       <el-table-column prop="orderid" label="订单号" width="140" show-overflow-tooltip />
       <el-table-column prop="product_name" label="商品" min-width="130" show-overflow-tooltip />
+      <el-table-column label="状态" width="110" align="center">
+        <template #default="{ row }">
+          <el-tag :type="statusTagType(row.status)">{{ statusMap[row.status] || '未知' }}</el-tag>
+        </template>
+      </el-table-column>
       <el-table-column prop="number" label="编号" width="100" show-overflow-tooltip />
-      <el-table-column prop="imei" label="IMEI" width="130" show-overflow-tooltip />
-      <el-table-column prop="referee" label="推荐人" width="100" show-overflow-tooltip />
       <el-table-column prop="assessprice" label="预估价" width="90" align="right" />
       <el-table-column prop="actualprice" label="评估价" width="90" align="right" />
       <el-table-column prop="applyprice" label="申请价" width="90" align="right" />
@@ -42,11 +45,6 @@
       <el-table-column label="来源" width="90" align="center">
         <template #default="{ row }">
           <el-tag type="info" size="small">{{ sourceMap[row.source] || '未知' }}</el-tag>
-        </template>
-      </el-table-column>
-      <el-table-column label="状态" width="110" align="center">
-        <template #default="{ row }">
-          <el-tag :type="statusTagType(row.status)">{{ statusMap[row.status] || '未知' }}</el-tag>
         </template>
       </el-table-column>
       <el-table-column label="快递上门" width="80" align="center">
